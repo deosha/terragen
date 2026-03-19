@@ -12,8 +12,15 @@ See: https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
 import os
 from typing import Any
 
-from anthropic import Anthropic, APIError as AnthropicAPIError, AuthenticationError as AnthropicAuthError
-from anthropic import RateLimitError as AnthropicRateLimitError, APITimeoutError as AnthropicTimeoutError
+from anthropic import (
+    Anthropic,
+    APIError as AnthropicAPIError,
+    AuthenticationError as AnthropicAuthError,
+)
+from anthropic import (
+    RateLimitError as AnthropicRateLimitError,
+    APITimeoutError as AnthropicTimeoutError,
+)
 
 from .base import LLMResponse, TextBlock, ToolCall, StopReason, Usage
 from .exceptions import APIError, AuthenticationError, RateLimitError, TimeoutError
@@ -40,7 +47,9 @@ class AnthropicAdapter:
         """Lazy initialization of client."""
         if self._client is None:
             if not self.api_key:
-                raise AuthenticationError("ANTHROPIC_API_KEY not set", self.PROVIDER_NAME)
+                raise AuthenticationError(
+                    "ANTHROPIC_API_KEY not set", self.PROVIDER_NAME
+                )
             self._client = Anthropic(api_key=self.api_key)
         return self._client
 
@@ -56,7 +65,7 @@ class AnthropicAdapter:
         max_tokens: int = 8096,
         system: str | None = None,
         tools: list[dict[str, Any]] | None = None,
-        **kwargs
+        **kwargs,
     ) -> LLMResponse:
         """Create a message using Anthropic API with optional prompt caching.
 
@@ -93,7 +102,7 @@ class AnthropicAdapter:
                         {
                             "type": "text",
                             "text": system,
-                            "cache_control": {"type": "ephemeral"}
+                            "cache_control": {"type": "ephemeral"},
                         }
                     ]
                 else:
@@ -136,11 +145,9 @@ class AnthropicAdapter:
             if block.type == "text":
                 content.append(TextBlock(text=block.text))
             elif block.type == "tool_use":
-                content.append(ToolCall(
-                    id=block.id,
-                    name=block.name,
-                    input=block.input
-                ))
+                content.append(
+                    ToolCall(id=block.id, name=block.name, input=block.input)
+                )
 
         # Map stop reason
         stop_reason_map = {
@@ -166,5 +173,5 @@ class AnthropicAdapter:
             ),
             provider=self.PROVIDER_NAME,
             model=model,
-            raw_response=response
+            raw_response=response,
         )

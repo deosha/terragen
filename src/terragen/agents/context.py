@@ -30,7 +30,9 @@ class PipelineContext:
     # Pipeline configuration
     skip_clarify: bool = False
     skip_cost: bool = False
-    skip_security: bool = False  # Skip automatic security scanning (user can run manually)
+    skip_security: bool = (
+        False  # Skip automatic security scanning (user can run manually)
+    )
     max_security_fix_attempts: int = 3
     chat_mode: bool = False
     backend_config: Optional[dict[str, Any]] = None
@@ -69,9 +71,7 @@ class PipelineContext:
     def get_blocking_issues(self) -> list[SecurityIssue]:
         """Return security issues that block the pipeline (CRITICAL + HIGH)."""
         return [
-            issue
-            for issue in self.security_issues
-            if issue.severity.blocks_pipeline()
+            issue for issue in self.security_issues if issue.severity.blocks_pipeline()
         ]
 
     def get_warning_issues(self) -> list[SecurityIssue]:
@@ -172,7 +172,11 @@ class PipelineContext:
         if self.validation_errors:
             lines.append("## Validation Errors to Fix:\n")
             for i, error in enumerate(self.validation_errors, 1):
-                location = f"{error.file_path}:{error.line_number}" if error.file_path else "unknown"
+                location = (
+                    f"{error.file_path}:{error.line_number}"
+                    if error.file_path
+                    else "unknown"
+                )
                 lines.append(
                     f"{i}. [{error.error_type}] {error.message}\n"
                     f"   Location: {location}\n"

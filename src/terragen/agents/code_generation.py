@@ -9,7 +9,12 @@ from rich.panel import Panel
 
 from terragen.agents.base import AgentResult, AgentStatus, BaseAgent
 from terragen.agents.context import PipelineContext
-from terragen.agent import TerraGenAgent, run_agent, run_interactive_session, EventCallback
+from terragen.agent import (
+    TerraGenAgent,
+    run_agent,
+    run_interactive_session,
+    EventCallback,
+)
 from terragen.config import SYSTEM_PROMPT, LLM_MODELS, FALLBACK_ORDER
 from terragen.questions import build_clarification_context, build_backend_context
 from terragen.patterns import learn_patterns_from_repo as learn_patterns
@@ -302,7 +307,8 @@ class CodeGenerationAgent(BaseAgent):
         parts.append(security_rules)
 
         # Add instructions
-        parts.append("""
+        parts.append(
+            """
 ## Instructions
 1. Create all Terraform files in {output_dir}/ using ABSOLUTE paths
 2. Include GitHub Actions workflows in .github/workflows/
@@ -310,7 +316,10 @@ class CodeGenerationAgent(BaseAgent):
 4. Follow ALL security rules above - code MUST pass tfsec, checkov, and policy scans
 5. Start with providers.tf and versions.tf
 
-Begin generating the Terraform code now.""".format(output_dir=context.output_dir))
+Begin generating the Terraform code now.""".format(
+                output_dir=context.output_dir
+            )
+        )
 
         return "\n".join(parts)
 
@@ -340,7 +349,8 @@ Begin generating the Terraform code now.""".format(output_dir=context.output_dir
         if affected_files:
             parts.append(f"\n## Affected Files: {', '.join(sorted(affected_files))}")
 
-        parts.append("""
+        parts.append(
+            """
 ## Instructions
 1. READ each affected file first before making changes
 2. Fix ONLY the listed issues - do not refactor unrelated code
@@ -350,7 +360,8 @@ Begin generating the Terraform code now.""".format(output_dir=context.output_dir
 6. Run terraform fmt after making changes
 7. Ensure all referenced resources and variables exist
 
-Begin fixing the issues now.""")
+Begin fixing the issues now."""
+        )
 
         return "\n".join(parts)
 

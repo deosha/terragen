@@ -30,7 +30,9 @@ class SecurityAgent(BaseAgent):
     description = "Runs tfsec security scans on Terraform code"
     is_gate = True  # Security issues can block pipeline
 
-    def __init__(self, console: Optional[Console] = None, log_callback: Optional[Any] = None):
+    def __init__(
+        self, console: Optional[Console] = None, log_callback: Optional[Any] = None
+    ):
         """Initialize the security agent."""
         super().__init__(console, log_callback)
         self.timeout = 120  # seconds
@@ -78,14 +80,20 @@ class SecurityAgent(BaseAgent):
             print_security_issues_summary(self.console, issues)
             # Log issues to stream for UI
             self._log_info(f"┌{'─' * 90}┐")
-            self._log_info(f"│ {'Severity':<10} │ {'Rule ID':<15} │ {'File:Line':<20} │ {'Description':<35} │")
+            self._log_info(
+                f"│ {'Severity':<10} │ {'Rule ID':<15} │ {'File:Line':<20} │ {'Description':<35} │"
+            )
             self._log_info(f"├{'─' * 90}┤")
             for issue in issues[:10]:  # Limit to 10 for terminal
                 sev = issue.severity.value
                 rule = (issue.rule_id or "")[:14]
-                file_line = f"{Path(issue.file_path).name if issue.file_path else '-'}:{issue.line_number or '-'}"[:19]
+                file_line = f"{Path(issue.file_path).name if issue.file_path else '-'}:{issue.line_number or '-'}"[
+                    :19
+                ]
                 desc = (issue.description or "")[:34]
-                self._log_info(f"│ {sev:<10} │ {rule:<15} │ {file_line:<20} │ {desc:<35} │")
+                self._log_info(
+                    f"│ {sev:<10} │ {rule:<15} │ {file_line:<20} │ {desc:<35} │"
+                )
             if len(issues) > 10:
                 self._log_info(f"│ ... and {len(issues) - 10} more issues {'─' * 56} │")
             self._log_info(f"└{'─' * 90}┘")
@@ -155,7 +163,8 @@ class SecurityAgent(BaseAgent):
                     [
                         "tfsec",
                         str(output_dir),
-                        "--format", "json",
+                        "--format",
+                        "json",
                         "--soft-fail",  # Don't return non-zero exit code
                     ],
                     capture_output=True,
@@ -208,7 +217,9 @@ class SecurityAgent(BaseAgent):
             issue = SecurityIssue(
                 severity=severity,
                 rule_id=result.get("rule_id", result.get("long_id", "UNKNOWN")),
-                description=result.get("description", result.get("rule_description", "Unknown issue")),
+                description=result.get(
+                    "description", result.get("rule_description", "Unknown issue")
+                ),
                 file_path=filename,
                 line_number=start_line,
                 resource=result.get("resource", ""),

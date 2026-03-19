@@ -26,7 +26,10 @@ async def startup():
         os.environ["ANTHROPIC_API_KEY"] = settings.anthropic_api_key
         logger.info("TerraGen API started with Anthropic API key configured")
     else:
-        logger.warning("TerraGen API started WITHOUT Anthropic API key - generation will fail")
+        logger.warning(
+            "TerraGen API started WITHOUT Anthropic API key - generation will fail"
+        )
+
 
 # CORS
 settings = get_settings()

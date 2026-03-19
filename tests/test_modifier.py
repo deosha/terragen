@@ -88,9 +88,7 @@ class TestReadStateFile:
     def test_invalid_json_state(self):
         """Should handle invalid JSON in state file."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            Path(os.path.join(tmpdir, "terraform.tfstate")).write_text(
-                "not valid json"
-            )
+            Path(os.path.join(tmpdir, "terraform.tfstate")).write_text("not valid json")
 
             result = read_state_file(Path(tmpdir))
 
@@ -106,17 +104,16 @@ class TestGetGitInfo:
             subprocess.run(["git", "init"], cwd=tmpdir, capture_output=True)
             subprocess.run(
                 ["git", "config", "user.email", "test@test.com"],
-                cwd=tmpdir, capture_output=True
+                cwd=tmpdir,
+                capture_output=True,
             )
             subprocess.run(
-                ["git", "config", "user.name", "Test"],
-                cwd=tmpdir, capture_output=True
+                ["git", "config", "user.name", "Test"], cwd=tmpdir, capture_output=True
             )
             Path(os.path.join(tmpdir, "test.txt")).write_text("test")
             subprocess.run(["git", "add", "."], cwd=tmpdir, capture_output=True)
             subprocess.run(
-                ["git", "commit", "-m", "initial"],
-                cwd=tmpdir, capture_output=True
+                ["git", "commit", "-m", "initial"], cwd=tmpdir, capture_output=True
             )
 
             result = get_git_info(Path(tmpdir))
@@ -138,17 +135,16 @@ class TestGetGitInfo:
             subprocess.run(["git", "init"], cwd=tmpdir, capture_output=True)
             subprocess.run(
                 ["git", "config", "user.email", "test@test.com"],
-                cwd=tmpdir, capture_output=True
+                cwd=tmpdir,
+                capture_output=True,
             )
             subprocess.run(
-                ["git", "config", "user.name", "Test"],
-                cwd=tmpdir, capture_output=True
+                ["git", "config", "user.name", "Test"], cwd=tmpdir, capture_output=True
             )
             Path(os.path.join(tmpdir, "test.txt")).write_text("test")
             subprocess.run(["git", "add", "."], cwd=tmpdir, capture_output=True)
             subprocess.run(
-                ["git", "commit", "-m", "initial"],
-                cwd=tmpdir, capture_output=True
+                ["git", "commit", "-m", "initial"], cwd=tmpdir, capture_output=True
             )
             # Add uncommitted change
             Path(os.path.join(tmpdir, "new.txt")).write_text("new")
@@ -195,8 +191,7 @@ class TestSummarizeState:
         """Should limit displayed resources."""
         state = {
             "resources": [
-                {"type": f"aws_resource_{i}", "name": f"res{i}"}
-                for i in range(20)
+                {"type": f"aws_resource_{i}", "name": f"res{i}"} for i in range(20)
             ]
         }
 

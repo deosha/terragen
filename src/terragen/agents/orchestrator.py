@@ -72,13 +72,19 @@ class PipelineOrchestrator:
 
         # Initialize agents with log callback for UI streaming
         log_cb = agent_event_callback if session_callback else None
-        self.clarification_agent = ClarificationAgent(console=self.console, log_callback=log_cb)
+        self.clarification_agent = ClarificationAgent(
+            console=self.console, log_callback=log_cb
+        )
         self.code_gen_agent = CodeGenerationAgent(
             console=self.console,
             event_callback=agent_event_callback if session_callback else None,
         )
-        self.validation_agent = ValidationAgent(console=self.console, log_callback=log_cb)
-        self.fast_security_agent = FastSecurityAgent(console=self.console, log_callback=log_cb)
+        self.validation_agent = ValidationAgent(
+            console=self.console, log_callback=log_cb
+        )
+        self.fast_security_agent = FastSecurityAgent(
+            console=self.console, log_callback=log_cb
+        )
         self.security_agent = SecurityAgent(console=self.console, log_callback=log_cb)
         self.checkov_agent = CheckovAgent(console=self.console, log_callback=log_cb)
         self.policy_agent = PolicyAgent(console=self.console, log_callback=log_cb)
@@ -107,11 +113,13 @@ class PipelineOrchestrator:
         """
         context.pipeline_started = True
 
-        self.console.print(Panel.fit(
-            "[bold blue]TerraGen Multi-Agent Pipeline[/bold blue]\n"
-            "[dim]Generating production-ready Terraform with security gates[/dim]",
-            border_style="blue",
-        ))
+        self.console.print(
+            Panel.fit(
+                "[bold blue]TerraGen Multi-Agent Pipeline[/bold blue]\n"
+                "[dim]Generating production-ready Terraform with security gates[/dim]",
+                border_style="blue",
+            )
+        )
 
         try:
             # Step 1: Clarification
@@ -148,7 +156,10 @@ class PipelineOrchestrator:
                     return context
 
                 # Skip security scanning - user can run manually from options panel
-                self._emit_log("Skipping security scanning (run manually from options)", level="info")
+                self._emit_log(
+                    "Skipping security scanning (run manually from options)",
+                    level="info",
+                )
                 self.agent_statuses["SecurityAgent"] = AgentStatus.SKIPPED
                 self.agent_statuses["CheckovAgent"] = AgentStatus.SKIPPED
                 self.agent_statuses["PolicyAgent"] = AgentStatus.SKIPPED
@@ -178,12 +189,12 @@ class PipelineOrchestrator:
             self._emit_log(
                 f"Generated {len(context.generated_files)} files",
                 level="info",
-                details=", ".join(sorted(context.generated_files.keys())[:5])
+                details=", ".join(sorted(context.generated_files.keys())[:5]),
             )
             if context.cost_estimated:
                 self._emit_log(
                     f"Estimated cost: ${context.total_monthly_cost:.2f}/month",
-                    level="info"
+                    level="info",
                 )
             else:
                 self._emit_log("Cost estimation skipped or unavailable", level="info")
@@ -284,7 +295,12 @@ class PipelineOrchestrator:
         elif result.status == AgentStatus.FAILED:
             self.console.print(f"[red]<<< {phase_name} failed[/red]")
             error_details = "; ".join(result.errors[:3]) if result.errors else None
-            self._emit_log(f"{phase_name} failed", level="error", agent=agent.name, details=error_details)
+            self._emit_log(
+                f"{phase_name} failed",
+                level="error",
+                agent=agent.name,
+                details=error_details,
+            )
             self._update_session({"failed_agent": agent.name})
             for error in result.errors[:3]:  # Show first 3 errors
                 self.console.print(f"[red]    {error}[/red]")
@@ -364,10 +380,12 @@ class PipelineOrchestrator:
                     f"Attempting to fix validation issues (attempt {attempt}/{max_attempts})",
                     level="warning",
                 )
-                self._update_session({
-                    "fix_attempt": attempt,
-                    "max_fix_attempts": max_attempts,
-                })
+                self._update_session(
+                    {
+                        "fix_attempt": attempt,
+                        "max_fix_attempts": max_attempts,
+                    }
+                )
 
                 fix_result = await self.code_gen_agent.execute_fix(context)
                 if fix_result.failed:
@@ -396,7 +414,9 @@ class PipelineOrchestrator:
         # 3. After fix loops complete, run FULL tools for final verification
 
         # --- Initial full scan ---
-        self._emit_log("Running full security scan (tfsec, checkov, opa)...", level="info")
+        self._emit_log(
+            "Running full security scan (tfsec, checkov, opa)...", level="info"
+        )
         context.clear_security_issues()
 
         # Run security scans (tfsec)
@@ -438,10 +458,12 @@ class PipelineOrchestrator:
                 f"Found {blocking_count} blocking security issues. Attempting fix (attempt {attempt}/{max_attempts})",
                 level="warning",
             )
-            self._update_session({
-                "fix_attempt": attempt,
-                "max_fix_attempts": max_attempts,
-            })
+            self._update_session(
+                {
+                    "fix_attempt": attempt,
+                    "max_fix_attempts": max_attempts,
+                }
+            )
 
             # Try to fix security issues
             fix_result = await self.code_gen_agent.execute_fix(context)
@@ -499,7 +521,10 @@ class PipelineOrchestrator:
         # --- Final verification with full tools ---
         if context.security_fix_attempts > 0:
             # We made fixes, re-run full tools for final verification
-            self._emit_log("Running final security verification (tfsec, checkov, opa)...", level="info")
+            self._emit_log(
+                "Running final security verification (tfsec, checkov, opa)...",
+                level="info",
+            )
             context.clear_security_issues()
 
             await self._run_agent(
@@ -528,7 +553,7 @@ class PipelineOrchestrator:
             self._emit_log(
                 f"Security issues remain after {context.security_fix_attempts} fix attempts. "
                 "Code generated with warnings - review security issues before deploying.",
-                level="warning"
+                level="warning",
             )
             return True  # Continue pipeline with warnings
         else:
@@ -557,26 +582,32 @@ class PipelineOrchestrator:
             message_parts.append(f"  ... and {len(tf_files) - 10} more")
 
         if context.cost_estimated:
-            message_parts.extend([
+            message_parts.extend(
+                [
+                    "",
+                    f"[bold]Estimated Cost:[/bold]",
+                    f"  Monthly: ${context.total_monthly_cost:,.2f}",
+                    f"  Yearly:  ${context.total_yearly_cost:,.2f}",
+                ]
+            )
+
+        message_parts.extend(
+            [
                 "",
-                f"[bold]Estimated Cost:[/bold]",
-                f"  Monthly: ${context.total_monthly_cost:,.2f}",
-                f"  Yearly:  ${context.total_yearly_cost:,.2f}",
-            ])
+                "[bold]Next Steps:[/bold]",
+                f"  cd {context.output_dir}",
+                "  terraform init",
+                "  terraform plan",
+                "  terraform apply",
+            ]
+        )
 
-        message_parts.extend([
-            "",
-            "[bold]Next Steps:[/bold]",
-            f"  cd {context.output_dir}",
-            "  terraform init",
-            "  terraform plan",
-            "  terraform apply",
-        ])
-
-        self.console.print(create_success_panel(
-            "\n".join(message_parts),
-            title="Generation Complete",
-        ))
+        self.console.print(
+            create_success_panel(
+                "\n".join(message_parts),
+                title="Generation Complete",
+            )
+        )
 
 
 async def run_pipeline(

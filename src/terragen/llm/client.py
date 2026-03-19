@@ -90,15 +90,16 @@ class UnifiedLLMClient:
         self.use_router = use_router
 
         # Initialize adapters
-        self._adapters: dict[str, AnthropicAdapter | GrokAdapter | OpenAIAdapter | DeepSeekAdapter] = {}
+        self._adapters: dict[
+            str, AnthropicAdapter | GrokAdapter | OpenAIAdapter | DeepSeekAdapter
+        ] = {}
         for provider in self.fallback_order:
             if provider in PROVIDER_ADAPTERS:
                 adapter_class = PROVIDER_ADAPTERS[provider]
                 api_key = self.api_keys.get(provider)
                 default_model = self.models.get(provider)
                 self._adapters[provider] = adapter_class(
-                    api_key=api_key,
-                    default_model=default_model
+                    api_key=api_key, default_model=default_model
                 )
 
         # Initialize router if enabled
@@ -116,7 +117,8 @@ class UnifiedLLMClient:
     def get_available_providers(self) -> list[str]:
         """Get list of providers with API keys configured."""
         return [
-            provider for provider in self.fallback_order
+            provider
+            for provider in self.fallback_order
             if provider in self._adapters and self._adapters[provider].is_available()
         ]
 
@@ -128,7 +130,7 @@ class UnifiedLLMClient:
         system: str | None = None,
         tools: list[dict[str, Any]] | None = None,
         preferred_provider: str | None = None,
-        **kwargs
+        **kwargs,
     ) -> LLMResponse:
         """Create a message using available providers with automatic fallback.
 
@@ -177,7 +179,7 @@ class UnifiedLLMClient:
                     max_tokens=max_tokens,
                     system=system,
                     tools=tools,
-                    **kwargs
+                    **kwargs,
                 )
 
             except AuthenticationError as e:
@@ -202,7 +204,7 @@ class UnifiedLLMClient:
         max_tokens: int = 8096,
         system: str | None = None,
         tools: list[dict[str, Any]] | None = None,
-        **kwargs
+        **kwargs,
     ) -> LLMResponse:
         """Create a message using intelligent model routing.
 
@@ -231,7 +233,7 @@ class UnifiedLLMClient:
                 max_tokens=max_tokens,
                 system=system,
                 tools=tools,
-                **kwargs
+                **kwargs,
             )
 
         # Get recommended model from router
@@ -257,7 +259,7 @@ class UnifiedLLMClient:
                     max_tokens=max_tokens,
                     system=system,
                     tools=tools,
-                    **kwargs
+                    **kwargs,
                 )
         except (APIError, RateLimitError, TimeoutError):
             pass  # Fall through to fallback
@@ -273,7 +275,7 @@ class UnifiedLLMClient:
                     max_tokens=max_tokens,
                     system=system,
                     tools=tools,
-                    **kwargs
+                    **kwargs,
                 )
 
         # Ultimate fallback: use default create_message behavior
@@ -282,7 +284,7 @@ class UnifiedLLMClient:
             max_tokens=max_tokens,
             system=system,
             tools=tools,
-            **kwargs
+            **kwargs,
         )
 
     def classify_prompt(self, prompt: str) -> Optional[ClassificationResult]:

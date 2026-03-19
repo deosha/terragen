@@ -9,6 +9,7 @@ from typing import Any
 
 class StopReason(Enum):
     """Normalized stop reasons across providers."""
+
     END_TURN = "end_turn"
     TOOL_USE = "tool_use"
     MAX_TOKENS = "max_tokens"
@@ -19,6 +20,7 @@ class StopReason(Enum):
 @dataclass
 class Usage:
     """Token usage statistics with cache tracking."""
+
     input_tokens: int
     output_tokens: int
     # Cache-specific fields (Anthropic prompt caching)
@@ -32,7 +34,9 @@ class Usage:
     @property
     def cache_hit_rate(self) -> float:
         """Calculate cache hit rate (0.0 to 1.0)."""
-        total_cacheable = self.cache_creation_input_tokens + self.cache_read_input_tokens
+        total_cacheable = (
+            self.cache_creation_input_tokens + self.cache_read_input_tokens
+        )
         if total_cacheable == 0:
             return 0.0
         return self.cache_read_input_tokens / total_cacheable
@@ -47,6 +51,7 @@ class Usage:
 @dataclass
 class TextBlock:
     """A text content block."""
+
     text: str
     type: str = "text"
 
@@ -54,6 +59,7 @@ class TextBlock:
 @dataclass
 class ToolCall:
     """A tool/function call request."""
+
     id: str
     name: str
     input: dict[str, Any]
@@ -66,6 +72,7 @@ ContentBlock = TextBlock | ToolCall
 @dataclass
 class LLMResponse:
     """Normalized response from any LLM provider."""
+
     content: list[ContentBlock]
     stop_reason: StopReason
     usage: Usage
@@ -76,13 +83,9 @@ class LLMResponse:
     def get_text(self) -> str:
         """Get concatenated text from all text blocks."""
         return "".join(
-            block.text for block in self.content
-            if isinstance(block, TextBlock)
+            block.text for block in self.content if isinstance(block, TextBlock)
         )
 
     def get_tool_calls(self) -> list[ToolCall]:
         """Get all tool calls from response."""
-        return [
-            block for block in self.content
-            if isinstance(block, ToolCall)
-        ]
+        return [block for block in self.content if isinstance(block, ToolCall)]

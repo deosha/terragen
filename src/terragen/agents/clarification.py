@@ -29,7 +29,9 @@ class ClarificationAgent(BaseAgent):
     description = "Auto-detects if clarifying questions are needed"
     is_gate = False  # Clarification doesn't block pipeline
 
-    def __init__(self, console: Optional[Console] = None, log_callback: Optional[Any] = None):
+    def __init__(
+        self, console: Optional[Console] = None, log_callback: Optional[Any] = None
+    ):
         """Initialize the clarification agent."""
         super().__init__(console, log_callback)
         self.client = UnifiedLLMClient(

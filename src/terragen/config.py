@@ -15,7 +15,9 @@ LLM_MODELS = {
     "anthropic": os.environ.get("TERRAGEN_ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
     "openai": os.environ.get("TERRAGEN_OPENAI_MODEL", "gpt-4o"),
     "deepseek": os.environ.get("TERRAGEN_DEEPSEEK_MODEL", "deepseek-chat"),
-    "xai": os.environ.get("TERRAGEN_XAI_MODEL", "grok-4-1"),  # Most intelligent, #1 LMArena
+    "xai": os.environ.get(
+        "TERRAGEN_XAI_MODEL", "grok-4-1"
+    ),  # Most intelligent, #1 LMArena
 }
 
 # Fallback order for LLM providers
@@ -32,21 +34,21 @@ PROVIDER_REGIONS = {
     "aws": {
         "default": "us-east-1",
         "examples": ["us-east-1", "us-west-2", "eu-west-1", "ap-south-1"],
-        "help": "AWS region (e.g., us-east-1, us-west-2, ap-south-1, eu-west-1)"
+        "help": "AWS region (e.g., us-east-1, us-west-2, ap-south-1, eu-west-1)",
     },
     "gcp": {
         "default": "us-central1",
         "examples": ["us-central1", "us-east1", "europe-west1", "asia-south1"],
-        "help": "GCP region (e.g., us-central1, us-east1, asia-south1, europe-west1)"
+        "help": "GCP region (e.g., us-central1, us-east1, asia-south1, europe-west1)",
     },
     "azure": {
         "default": "eastus",
         "examples": ["eastus", "westus2", "westeurope", "centralindia"],
-        "help": "Azure region (e.g., eastus, westus2, centralindia, westeurope)"
-    }
+        "help": "Azure region (e.g., eastus, westus2, centralindia, westeurope)",
+    },
 }
 
-SYSTEM_PROMPT = '''You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu.
+SYSTEM_PROMPT = """You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu.
 
 ## Your Task
 Generate production-ready Terraform code based on user requirements.
@@ -194,9 +196,9 @@ CRITICAL: Outputs must work with `terraform plan` (before any resources exist).
    output "addons" {
      value = { for k, v in aws_eks_addon.this : k => { name = v.addon_name, version = v.addon_version } }
    }
-   ```'''
+   ```"""
 
-MODIFY_SYSTEM_PROMPT = '''You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu.
+MODIFY_SYSTEM_PROMPT = """You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu.
 
 ## Your Task
 MODIFY existing Terraform infrastructure based on user requirements. You are working with an EXISTING codebase - do NOT recreate everything from scratch.
@@ -223,23 +225,32 @@ MODIFY existing Terraform infrastructure based on user requirements. You are wor
 - Use variables for sensitive values
 - Enable encryption for storage and databases
 - Use security groups with minimal access
-- Enable logging and monitoring'''
+- Enable logging and monitoring"""
 
 # Clarifying questions configuration
 CLARIFICATION_QUESTIONS = {
     "cloud_provider": {
         "question": "Which cloud provider?",
-        "options": ["AWS (Recommended)", "Google Cloud (GCP)", "Microsoft Azure", "Multi-cloud"]
+        "options": [
+            "AWS (Recommended)",
+            "Google Cloud (GCP)",
+            "Microsoft Azure",
+            "Multi-cloud",
+        ],
     },
     "environment": {
         "question": "What environment is this for?",
-        "options": ["Production (HA, multi-AZ)", "Staging", "Development (cost-optimized)"]
-    }
+        "options": [
+            "Production (HA, multi-AZ)",
+            "Staging",
+            "Development (cost-optimized)",
+        ],
+    },
 }
 
 # Agent-specific system prompts for the multi-agent pipeline
 
-CLARIFICATION_SYSTEM_PROMPT = '''You are an expert at analyzing infrastructure requirements.
+CLARIFICATION_SYSTEM_PROMPT = """You are an expert at analyzing infrastructure requirements.
 
 Given a user's Terraform infrastructure request, determine:
 1. Is the prompt detailed enough to generate production-quality Terraform code?
@@ -261,9 +272,9 @@ Focus on asking questions about:
 - Specific configurations (sizes, counts, versions)
 - Security requirements (encryption, access controls)
 - Networking requirements (VPC, subnets, public/private)
-- Cost considerations (instance types, reserved capacity)'''
+- Cost considerations (instance types, reserved capacity)"""
 
-SECURITY_FIX_SYSTEM_PROMPT = '''You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu security.
+SECURITY_FIX_SYSTEM_PROMPT = """You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu security.
 
 ## Your Task
 Fix the security issues identified in the Terraform code. You have access to the list of security issues with their locations and remediation guidance.
@@ -302,9 +313,9 @@ Fix the security issues identified in the Terraform code. You have access to the
 ### General
 - Add required tags
 - Enable logging where applicable
-- Use encrypted volumes'''
+- Use encrypted volumes"""
 
-VALIDATION_FIX_SYSTEM_PROMPT = '''You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu.
+VALIDATION_FIX_SYSTEM_PROMPT = """You are TerraGen, an expert infrastructure engineer specializing in Terraform/OpenTofu.
 
 ## Your Task
 Fix the validation errors in the Terraform code. The code has failed terraform fmt, init, or validate.
@@ -335,7 +346,7 @@ Fix the validation errors in the Terraform code. The code has failed terraform f
 
 ### Type Errors
 - Ensure argument types match (string vs number vs bool vs list)
-- Use proper type conversions where needed'''
+- Use proper type conversions where needed"""
 
 
 def get_default_region(provider: str) -> str:

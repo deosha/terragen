@@ -131,7 +131,9 @@ def analyze_diagram(
     }
 
 
-def build_terraform_prompt(analysis: str, additional_context: Optional[str] = None) -> str:
+def build_terraform_prompt(
+    analysis: str, additional_context: Optional[str] = None
+) -> str:
     """
     Build a detailed prompt for Terraform code generation from diagram analysis.
 

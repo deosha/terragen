@@ -88,7 +88,9 @@ class AgentResult:
     status: AgentStatus
     data: dict[str, Any] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
-    next_action: Optional[str] = None  # "fix_security", "fix_validation", "continue", None
+    next_action: Optional[str] = (
+        None  # "fix_security", "fix_validation", "continue", None
+    )
 
     @property
     def success(self) -> bool:
@@ -112,7 +114,9 @@ class BaseAgent(ABC):
     description: str = "Base agent class"
     is_gate: bool = False  # If True, failure blocks the pipeline
 
-    def __init__(self, console: Optional[Console] = None, log_callback: Optional[Any] = None):
+    def __init__(
+        self, console: Optional[Console] = None, log_callback: Optional[Any] = None
+    ):
         """Initialize the agent with an optional Rich console and log callback."""
         self.console = console or Console()
         self._status = AgentStatus.PENDING
@@ -146,14 +150,17 @@ class BaseAgent(ABC):
         # Emit to callback for UI streaming
         if self._log_callback:
             from datetime import datetime
-            self._log_callback({
-                "log": {
-                    "timestamp": datetime.utcnow().isoformat() + "Z",
-                    "level": level,
-                    "agent": self.name,
-                    "message": message,
+
+            self._log_callback(
+                {
+                    "log": {
+                        "timestamp": datetime.utcnow().isoformat() + "Z",
+                        "level": level,
+                        "agent": self.name,
+                        "message": message,
+                    }
                 }
-            })
+            )
 
     def _log_success(self, message: str) -> None:
         """Log a success message."""

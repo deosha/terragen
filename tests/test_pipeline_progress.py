@@ -47,10 +47,12 @@ class TestEventCallback:
 
         orchestrator._update_session({"current_agent": "TestAgent", "fix_attempt": 1})
 
-        callback.assert_called_once_with({
-            "current_agent": "TestAgent",
-            "fix_attempt": 1,
-        })
+        callback.assert_called_once_with(
+            {
+                "current_agent": "TestAgent",
+                "fix_attempt": 1,
+            }
+        )
 
     def test_emit_security_issues(self):
         """_emit_security_issues should log blocking issues."""
@@ -94,8 +96,12 @@ class TestSecurityFixLoopRollback:
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir)
             # Create initial valid terraform files
-            (output_dir / "main.tf").write_text('resource "aws_s3_bucket" "test" {\n  bucket = "test"\n}')
-            (output_dir / "variables.tf").write_text('variable "name" {\n  default = "test"\n}')
+            (output_dir / "main.tf").write_text(
+                'resource "aws_s3_bucket" "test" {\n  bucket = "test"\n}'
+            )
+            (output_dir / "variables.tf").write_text(
+                'variable "name" {\n  default = "test"\n}'
+            )
 
             context = PipelineContext(
                 user_prompt="Create S3 bucket",
@@ -134,13 +140,15 @@ class TestSecurityFixLoopRollback:
         async def mock_security(context):
             call_count[0] += 1
             if call_count[0] == 1:
-                context.add_security_issue(SecurityIssue(
-                    severity=IssueSeverity.CRITICAL,
-                    rule_id="TEST001",
-                    description="Test issue",
-                    file_path="main.tf",
-                    line_number=1,
-                ))
+                context.add_security_issue(
+                    SecurityIssue(
+                        severity=IssueSeverity.CRITICAL,
+                        rule_id="TEST001",
+                        description="Test issue",
+                        file_path="main.tf",
+                        line_number=1,
+                    )
+                )
                 return AgentResult(
                     status=AgentStatus.FAILED,
                     data={"blocking_issues": 1, "warning_issues": 0, "issues": []},
@@ -187,13 +195,15 @@ class TestSecurityFixLoopRollback:
 
         # Mock security to always find issues (to trigger fix loop)
         async def mock_security(context):
-            context.add_security_issue(SecurityIssue(
-                severity=IssueSeverity.CRITICAL,
-                rule_id="TEST001",
-                description="Test issue",
-                file_path="main.tf",
-                line_number=1,
-            ))
+            context.add_security_issue(
+                SecurityIssue(
+                    severity=IssueSeverity.CRITICAL,
+                    rule_id="TEST001",
+                    description="Test issue",
+                    file_path="main.tf",
+                    line_number=1,
+                )
+            )
             return AgentResult(
                 status=AgentStatus.FAILED,
                 data={"blocking_issues": 1, "warning_issues": 0, "issues": []},
@@ -246,13 +256,15 @@ class TestSecurityFixLoopRollback:
 
         # Mock security to always find issues
         async def mock_security(context):
-            context.add_security_issue(SecurityIssue(
-                severity=IssueSeverity.HIGH,
-                rule_id="TEST001",
-                description="Issue",
-                file_path="main.tf",
-                line_number=1,
-            ))
+            context.add_security_issue(
+                SecurityIssue(
+                    severity=IssueSeverity.HIGH,
+                    rule_id="TEST001",
+                    description="Issue",
+                    file_path="main.tf",
+                    line_number=1,
+                )
+            )
             return AgentResult(
                 status=AgentStatus.FAILED,
                 data={"blocking_issues": 1, "warning_issues": 0, "issues": []},
@@ -458,15 +470,19 @@ class TestSessionUpdates:
         callback = MagicMock()
         orchestrator = PipelineOrchestrator(session_callback=callback)
 
-        orchestrator._update_session({
-            "fix_attempt": 2,
-            "max_fix_attempts": 3,
-        })
+        orchestrator._update_session(
+            {
+                "fix_attempt": 2,
+                "max_fix_attempts": 3,
+            }
+        )
 
-        callback.assert_called_with({
-            "fix_attempt": 2,
-            "max_fix_attempts": 3,
-        })
+        callback.assert_called_with(
+            {
+                "fix_attempt": 2,
+                "max_fix_attempts": 3,
+            }
+        )
 
 
 class TestFixableIssues:
@@ -479,12 +495,14 @@ class TestFixableIssues:
         context = PipelineContext(user_prompt="test", output_dir=Path("/tmp"))
         assert context.has_fixable_issues() is False
 
-        context.add_validation_error(ValidationError(
-            error_type="validate",
-            message="Invalid reference",
-            file_path="main.tf",
-            line_number=10,
-        ))
+        context.add_validation_error(
+            ValidationError(
+                error_type="validate",
+                message="Invalid reference",
+                file_path="main.tf",
+                line_number=10,
+            )
+        )
 
         assert context.has_fixable_issues() is True
         assert context.has_validation_errors() is True
@@ -495,13 +513,15 @@ class TestFixableIssues:
         context = PipelineContext(user_prompt="test", output_dir=Path("/tmp"))
         assert context.has_fixable_issues() is False
 
-        context.add_security_issue(SecurityIssue(
-            severity=IssueSeverity.HIGH,
-            rule_id="TEST001",
-            description="Security issue",
-            file_path="main.tf",
-            line_number=5,
-        ))
+        context.add_security_issue(
+            SecurityIssue(
+                severity=IssueSeverity.HIGH,
+                rule_id="TEST001",
+                description="Security issue",
+                file_path="main.tf",
+                line_number=5,
+            )
+        )
 
         assert context.has_fixable_issues() is True
         assert context.has_blocking_issues() is True
@@ -513,17 +533,21 @@ class TestFixableIssues:
 
         context = PipelineContext(user_prompt="test", output_dir=Path("/tmp"))
 
-        context.add_validation_error(ValidationError(
-            error_type="validate",
-            message="Syntax error",
-        ))
-        context.add_security_issue(SecurityIssue(
-            severity=IssueSeverity.CRITICAL,
-            rule_id="TEST002",
-            description="Critical issue",
-            file_path="main.tf",
-            line_number=1,
-        ))
+        context.add_validation_error(
+            ValidationError(
+                error_type="validate",
+                message="Syntax error",
+            )
+        )
+        context.add_security_issue(
+            SecurityIssue(
+                severity=IssueSeverity.CRITICAL,
+                rule_id="TEST002",
+                description="Critical issue",
+                file_path="main.tf",
+                line_number=1,
+            )
+        )
 
         assert context.has_fixable_issues() is True
         assert context.has_validation_errors() is True
@@ -534,12 +558,14 @@ class TestFixableIssues:
         from terragen.agents.base import ValidationError
 
         context = PipelineContext(user_prompt="test", output_dir=Path("/tmp"))
-        context.add_validation_error(ValidationError(
-            error_type="validate",
-            message="Reference to undeclared variable",
-            file_path="main.tf",
-            line_number=15,
-        ))
+        context.add_validation_error(
+            ValidationError(
+                error_type="validate",
+                message="Reference to undeclared variable",
+                file_path="main.tf",
+                line_number=15,
+            )
+        )
 
         summary = context.get_issues_summary()
 
@@ -553,17 +579,21 @@ class TestFixableIssues:
 
         context = PipelineContext(user_prompt="test", output_dir=Path("/tmp"))
 
-        context.add_validation_error(ValidationError(
-            error_type="init",
-            message="Provider not found",
-        ))
-        context.add_security_issue(SecurityIssue(
-            severity=IssueSeverity.HIGH,
-            rule_id="AWS001",
-            description="S3 bucket not encrypted",
-            file_path="s3.tf",
-            line_number=10,
-        ))
+        context.add_validation_error(
+            ValidationError(
+                error_type="init",
+                message="Provider not found",
+            )
+        )
+        context.add_security_issue(
+            SecurityIssue(
+                severity=IssueSeverity.HIGH,
+                rule_id="AWS001",
+                description="S3 bucket not encrypted",
+                file_path="s3.tf",
+                line_number=10,
+            )
+        )
 
         summary = context.get_issues_summary()
 
@@ -576,13 +606,15 @@ class TestFixableIssues:
         """Warning-level security issues should not trigger has_fixable_issues."""
         context = PipelineContext(user_prompt="test", output_dir=Path("/tmp"))
 
-        context.add_security_issue(SecurityIssue(
-            severity=IssueSeverity.LOW,
-            rule_id="INFO001",
-            description="Low severity info",
-            file_path="main.tf",
-            line_number=1,
-        ))
+        context.add_security_issue(
+            SecurityIssue(
+                severity=IssueSeverity.LOW,
+                rule_id="INFO001",
+                description="Low severity info",
+                file_path="main.tf",
+                line_number=1,
+            )
+        )
 
         # LOW severity doesn't block pipeline
         assert context.has_fixable_issues() is False

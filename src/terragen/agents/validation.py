@@ -264,7 +264,11 @@ class ValidationAgent(BaseAgent):
                     errors.append(
                         ValidationError(
                             error_type="init",
-                            message=error_msg[:500] if error_msg else "terraform init failed",
+                            message=(
+                                error_msg[:500]
+                                if error_msg
+                                else "terraform init failed"
+                            ),
                         )
                     )
 
@@ -318,6 +322,7 @@ class ValidationAgent(BaseAgent):
                 # Try to parse JSON output for detailed errors
                 try:
                     import json
+
                     output = json.loads(result.stdout)
                     if not output.get("valid", True):
                         for diag in output.get("diagnostics", []):
@@ -326,12 +331,16 @@ class ValidationAgent(BaseAgent):
                                 line_number = 0
                                 if "range" in diag:
                                     file_path = diag["range"].get("filename", "")
-                                    line_number = diag["range"].get("start", {}).get("line", 0)
+                                    line_number = (
+                                        diag["range"].get("start", {}).get("line", 0)
+                                    )
 
                                 errors.append(
                                     ValidationError(
                                         error_type="validate",
-                                        message=diag.get("summary", "") + ": " + diag.get("detail", ""),
+                                        message=diag.get("summary", "")
+                                        + ": "
+                                        + diag.get("detail", ""),
                                         file_path=file_path,
                                         line_number=line_number,
                                     )
@@ -342,7 +351,11 @@ class ValidationAgent(BaseAgent):
                     errors.append(
                         ValidationError(
                             error_type="validate",
-                            message=error_msg[:500] if error_msg else "terraform validate failed",
+                            message=(
+                                error_msg[:500]
+                                if error_msg
+                                else "terraform validate failed"
+                            ),
                         )
                     )
 
@@ -370,7 +383,9 @@ class ValidationAgent(BaseAgent):
 
         return errors
 
-    async def _run_terraform_plan(self, output_dir: Path, provider: str) -> list[ValidationError]:
+    async def _run_terraform_plan(
+        self, output_dir: Path, provider: str
+    ) -> list[ValidationError]:
         """Run terraform plan to catch provider-specific errors.
 
         Args:
@@ -409,7 +424,13 @@ class ValidationAgent(BaseAgent):
             result = await asyncio.get_event_loop().run_in_executor(
                 None,
                 lambda: subprocess.run(
-                    ["terraform", "plan", "-detailed-exitcode", "-input=false", "-no-color"],
+                    [
+                        "terraform",
+                        "plan",
+                        "-detailed-exitcode",
+                        "-input=false",
+                        "-no-color",
+                    ],
                     cwd=output_dir,
                     capture_output=True,
                     text=True,
@@ -435,7 +456,9 @@ class ValidationAgent(BaseAgent):
                     )
             elif result.returncode == 2:
                 # Exit code 2 = plan succeeded with changes (this is fine)
-                self._log_success("✅ terraform plan succeeded (resources will be created)")
+                self._log_success(
+                    "✅ terraform plan succeeded (resources will be created)"
+                )
             elif result.returncode == 0:
                 self._log_success("✅ terraform plan succeeded (no changes needed)")
 
@@ -481,26 +504,36 @@ class ValidationAgent(BaseAgent):
             has_role = bool(os.environ.get("AWS_ROLE_ARN"))
             has_creds_file = Path.home().joinpath(".aws/credentials").exists()
 
-            self._log_info(f"AWS creds check: ACCESS_KEY={has_access_key}, PROFILE={has_profile}, ROLE={has_role}, FILE={has_creds_file}")
+            self._log_info(
+                f"AWS creds check: ACCESS_KEY={has_access_key}, PROFILE={has_profile}, ROLE={has_role}, FILE={has_creds_file}"
+            )
 
             return any([has_access_key, has_profile, has_role, has_creds_file])
         elif provider == "gcp":
-            return any([
-                os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"),
-                os.environ.get("GOOGLE_CLOUD_PROJECT"),
-                os.environ.get("CLOUDSDK_CORE_PROJECT"),
-                Path.home().joinpath(".config/gcloud/application_default_credentials.json").exists(),
-            ])
+            return any(
+                [
+                    os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"),
+                    os.environ.get("GOOGLE_CLOUD_PROJECT"),
+                    os.environ.get("CLOUDSDK_CORE_PROJECT"),
+                    Path.home()
+                    .joinpath(".config/gcloud/application_default_credentials.json")
+                    .exists(),
+                ]
+            )
         elif provider == "azure":
-            return any([
-                os.environ.get("ARM_CLIENT_ID"),
-                os.environ.get("ARM_SUBSCRIPTION_ID"),
-                os.environ.get("AZURE_SUBSCRIPTION_ID"),
-            ])
+            return any(
+                [
+                    os.environ.get("ARM_CLIENT_ID"),
+                    os.environ.get("ARM_SUBSCRIPTION_ID"),
+                    os.environ.get("AZURE_SUBSCRIPTION_ID"),
+                ]
+            )
 
         return False
 
-    def _parse_plan_error(self, error_msg: str, provider: str) -> Optional[ValidationError]:
+    def _parse_plan_error(
+        self, error_msg: str, provider: str
+    ) -> Optional[ValidationError]:
         """Parse terraform plan error to extract actionable info.
 
         Args:
@@ -514,17 +547,29 @@ class ValidationAgent(BaseAgent):
 
         # AWS-specific errors
         if provider == "aws":
-            if "invalidamid" in error_lower or "ami" in error_lower and "not found" in error_lower:
+            if (
+                "invalidamid" in error_lower
+                or "ami" in error_lower
+                and "not found" in error_lower
+            ):
                 return ValidationError(
                     error_type="plan",
-                    message="Invalid AMI ID. Use a data source to find valid AMIs: data \"aws_ami\" \"example\" { ... }",
+                    message='Invalid AMI ID. Use a data source to find valid AMIs: data "aws_ami" "example" { ... }',
                 )
-            if "invalidsubnetid" in error_lower or "subnet" in error_lower and "not found" in error_lower:
+            if (
+                "invalidsubnetid" in error_lower
+                or "subnet" in error_lower
+                and "not found" in error_lower
+            ):
                 return ValidationError(
                     error_type="plan",
                     message="Invalid subnet ID. Ensure subnets are created before referencing them.",
                 )
-            if "invalidvpcid" in error_lower or "vpc" in error_lower and "not found" in error_lower:
+            if (
+                "invalidvpcid" in error_lower
+                or "vpc" in error_lower
+                and "not found" in error_lower
+            ):
                 return ValidationError(
                     error_type="plan",
                     message="Invalid VPC ID. Ensure VPC is created before referencing it.",
@@ -583,12 +628,20 @@ class ValidationAgent(BaseAgent):
         if "s3" in error_lower or "bucket" in error_lower:
             if "nosuchbucket" in error_lower or "bucket does not exist" in error_lower:
                 return "S3 bucket does not exist. Create the bucket first or comment out the backend block in backend.tf to use local state."
-            if "accessdenied" in error_lower or "forbidden" in error_lower or "access denied" in error_lower:
+            if (
+                "accessdenied" in error_lower
+                or "forbidden" in error_lower
+                or "access denied" in error_lower
+            ):
                 return "Access denied to S3 bucket. Check your AWS credentials and bucket permissions, or comment out the backend block."
 
         # DynamoDB table errors
         if "dynamodb" in error_lower:
-            if "resourcenotfoundexception" in error_lower or "table" in error_lower and "not found" in error_lower:
+            if (
+                "resourcenotfoundexception" in error_lower
+                or "table" in error_lower
+                and "not found" in error_lower
+            ):
                 return "DynamoDB lock table does not exist. Create the table first or remove dynamodb_table from the backend config."
             if "accessdenied" in error_lower:
                 return "Access denied to DynamoDB table. Check your AWS credentials and table permissions."
@@ -602,7 +655,11 @@ class ValidationAgent(BaseAgent):
 
         # Azure storage errors
         if "azurerm" in error_lower or "azure" in error_lower:
-            if "containernotfound" in error_lower or "container" in error_lower and "not found" in error_lower:
+            if (
+                "containernotfound" in error_lower
+                or "container" in error_lower
+                and "not found" in error_lower
+            ):
                 return "Azure storage container does not exist. Create the container first or comment out the backend block."
             if "storageaccountnotfound" in error_lower:
                 return "Azure storage account does not exist. Create the storage account first."
@@ -611,15 +668,25 @@ class ValidationAgent(BaseAgent):
 
         # Terraform Cloud errors
         if "terraform cloud" in error_lower or "app.terraform.io" in error_lower:
-            if "organization" in error_lower and ("not found" in error_lower or "does not exist" in error_lower):
+            if "organization" in error_lower and (
+                "not found" in error_lower or "does not exist" in error_lower
+            ):
                 return "Terraform Cloud organization not found. Check your organization name or create one."
-            if "workspace" in error_lower and ("not found" in error_lower or "does not exist" in error_lower):
-                return "Terraform Cloud workspace not found. Create the workspace first."
+            if "workspace" in error_lower and (
+                "not found" in error_lower or "does not exist" in error_lower
+            ):
+                return (
+                    "Terraform Cloud workspace not found. Create the workspace first."
+                )
             if "unauthorized" in error_lower or "token" in error_lower:
                 return "Terraform Cloud authentication failed. Check your TF_TOKEN_app_terraform_io environment variable."
 
         # Generic backend errors
-        if "backend" in error_lower and ("forbidden" in error_lower or "access" in error_lower or "denied" in error_lower):
+        if "backend" in error_lower and (
+            "forbidden" in error_lower
+            or "access" in error_lower
+            or "denied" in error_lower
+        ):
             return "Backend configuration error: Access denied. Check your credentials and permissions, or comment out the backend block in backend.tf."
 
         return None

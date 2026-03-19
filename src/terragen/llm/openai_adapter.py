@@ -6,8 +6,15 @@ import json
 import os
 from typing import Any
 
-from openai import OpenAI, APIError as OpenAIAPIError, AuthenticationError as OpenAIAuthError
-from openai import RateLimitError as OpenAIRateLimitError, APITimeoutError as OpenAITimeoutError
+from openai import (
+    OpenAI,
+    APIError as OpenAIAPIError,
+    AuthenticationError as OpenAIAuthError,
+)
+from openai import (
+    RateLimitError as OpenAIRateLimitError,
+    APITimeoutError as OpenAITimeoutError,
+)
 
 from .base import LLMResponse, TextBlock, ToolCall, StopReason, Usage
 from .exceptions import APIError, AuthenticationError, RateLimitError, TimeoutError
@@ -45,7 +52,7 @@ class OpenAIAdapter:
         max_tokens: int = 8096,
         system: str | None = None,
         tools: list[dict[str, Any]] | None = None,
-        **kwargs
+        **kwargs,
     ) -> LLMResponse:
         """Create a message using OpenAI API.
 
@@ -72,7 +79,11 @@ class OpenAIAdapter:
             }
 
             # GPT-5 models use max_completion_tokens instead of max_tokens
-            if model.startswith("gpt-5") or model.startswith("o1") or model.startswith("o3"):
+            if (
+                model.startswith("gpt-5")
+                or model.startswith("o1")
+                or model.startswith("o3")
+            ):
                 api_kwargs["max_completion_tokens"] = max_tokens
             else:
                 api_kwargs["max_tokens"] = max_tokens
@@ -94,9 +105,7 @@ class OpenAIAdapter:
             raise APIError(str(e), self.PROVIDER_NAME, getattr(e, "status_code", None))
 
     def _convert_messages(
-        self,
-        messages: list[dict[str, Any]],
-        system: str | None
+        self, messages: list[dict[str, Any]], system: str | None
     ) -> list[dict[str, Any]]:
         """Convert Anthropic-style messages to OpenAI format."""
         openai_messages = []
@@ -114,16 +123,17 @@ class OpenAIAdapter:
                 if isinstance(content, list):
                     for item in content:
                         if item.get("type") == "tool_result":
-                            openai_messages.append({
-                                "role": "tool",
-                                "tool_call_id": item["tool_use_id"],
-                                "content": item["content"]
-                            })
+                            openai_messages.append(
+                                {
+                                    "role": "tool",
+                                    "tool_call_id": item["tool_use_id"],
+                                    "content": item["content"],
+                                }
+                            )
                         elif item.get("type") == "text":
-                            openai_messages.append({
-                                "role": "user",
-                                "content": item["text"]
-                            })
+                            openai_messages.append(
+                                {"role": "user", "content": item["text"]}
+                            )
                 else:
                     openai_messages.append({"role": "user", "content": content})
 
@@ -137,14 +147,16 @@ class OpenAIAdapter:
                         if item.get("type") == "text":
                             text_parts.append(item["text"])
                         elif item.get("type") == "tool_use":
-                            tool_calls.append({
-                                "id": item["id"],
-                                "type": "function",
-                                "function": {
-                                    "name": item["name"],
-                                    "arguments": json.dumps(item["input"])
+                            tool_calls.append(
+                                {
+                                    "id": item["id"],
+                                    "type": "function",
+                                    "function": {
+                                        "name": item["name"],
+                                        "arguments": json.dumps(item["input"]),
+                                    },
                                 }
-                            })
+                            )
 
                     assistant_msg: dict[str, Any] = {"role": "assistant"}
                     if text_parts:
@@ -175,16 +187,22 @@ class OpenAIAdapter:
             for tool_call in message.tool_calls:
                 # Parse arguments - handle potential JSON errors
                 try:
-                    args = json.loads(tool_call.function.arguments) if tool_call.function.arguments else {}
+                    args = (
+                        json.loads(tool_call.function.arguments)
+                        if tool_call.function.arguments
+                        else {}
+                    )
                 except json.JSONDecodeError:
                     # If JSON parsing fails, try to use as-is or empty dict
-                    args = {"raw_args": tool_call.function.arguments} if tool_call.function.arguments else {}
+                    args = (
+                        {"raw_args": tool_call.function.arguments}
+                        if tool_call.function.arguments
+                        else {}
+                    )
 
-                content.append(ToolCall(
-                    id=tool_call.id,
-                    name=tool_call.function.name,
-                    input=args
-                ))
+                content.append(
+                    ToolCall(id=tool_call.id, name=tool_call.function.name, input=args)
+                )
 
         # Ensure we have at least some content
         if not content:
@@ -218,5 +236,5 @@ class OpenAIAdapter:
             ),
             provider=self.PROVIDER_NAME,
             model=model,
-            raw_response=response
+            raw_response=response,
         )

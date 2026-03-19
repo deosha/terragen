@@ -51,7 +51,9 @@ class GenerateRequest(BaseModel):
     clarifications: Optional[dict] = None  # Production options, service configs
     skip_clarify: bool = True  # API defaults to skip clarify (non-interactive)
     skip_cost: bool = False
-    skip_security: bool = True  # Skip auto security scan - user runs manually from options
+    skip_security: bool = (
+        True  # Skip auto security scan - user runs manually from options
+    )
     max_security_fixes: int = 3
     use_pipeline: bool = True  # Use multi-agent pipeline
 
@@ -154,7 +156,7 @@ async def get_clarifying_questions(
     loop = asyncio.get_event_loop()
     questions = await loop.run_in_executor(
         None,
-        lambda: generate_clarifying_questions_llm(request.prompt, request.provider)
+        lambda: generate_clarifying_questions_llm(request.prompt, request.provider),
     )
 
     log_generate(
@@ -185,11 +187,13 @@ async def generate(
     import os
 
     # Check API key is configured
-    has_api_key = any([
-        os.environ.get("ANTHROPIC_API_KEY"),
-        os.environ.get("XAI_API_KEY"),
-        os.environ.get("OPENAI_API_KEY"),
-    ])
+    has_api_key = any(
+        [
+            os.environ.get("ANTHROPIC_API_KEY"),
+            os.environ.get("XAI_API_KEY"),
+            os.environ.get("OPENAI_API_KEY"),
+        ]
+    )
     if not has_api_key:
         raise HTTPException(
             status_code=500,
@@ -278,11 +282,13 @@ async def analyze_image(
             lambda: analyze_diagram(
                 request.image_data,
                 request.additional_context,
-            )
+            ),
         )
     except Exception as e:
         log_error("Image analysis failed", str(e))
-        raise HTTPException(status_code=500, detail=f"Failed to analyze image: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to analyze image: {str(e)}"
+        )
 
     analysis_text = analysis_result["analysis"]
 
@@ -294,7 +300,9 @@ async def analyze_image(
     additional_requirements = None
 
     # Extract cloud provider
-    provider_match = re.search(r"## Cloud Provider\s*\n+([^\n#]+)", analysis_text, re.IGNORECASE)
+    provider_match = re.search(
+        r"## Cloud Provider\s*\n+([^\n#]+)", analysis_text, re.IGNORECASE
+    )
     if provider_match:
         provider_text = provider_match.group(1).strip().lower()
         if "aws" in provider_text:
@@ -305,35 +313,49 @@ async def analyze_image(
             cloud_provider = "azure"
 
     # Extract components section
-    components_match = re.search(r"## Components\s*\n+(.*?)(?=##|$)", analysis_text, re.IGNORECASE | re.DOTALL)
+    components_match = re.search(
+        r"## Components\s*\n+(.*?)(?=##|$)", analysis_text, re.IGNORECASE | re.DOTALL
+    )
     if components_match:
         components_text = components_match.group(1).strip()
         # Parse bullet points or numbered items
         for line in components_text.split("\n"):
             line = line.strip()
-            if line and (line.startswith("-") or line.startswith("*") or line[0].isdigit()):
+            if line and (
+                line.startswith("-") or line.startswith("*") or line[0].isdigit()
+            ):
                 # Clean up the line
                 clean_line = re.sub(r"^[-*\d.)\s]+", "", line).strip()
                 if clean_line:
                     # Try to extract component name and description
                     if ":" in clean_line:
                         name, desc = clean_line.split(":", 1)
-                        components.append({"name": name.strip(), "description": desc.strip()})
+                        components.append(
+                            {"name": name.strip(), "description": desc.strip()}
+                        )
                     else:
                         components.append({"name": clean_line, "description": ""})
 
     # Extract networking section
-    networking_match = re.search(r"## Networking\s*\n+(.*?)(?=##|$)", analysis_text, re.IGNORECASE | re.DOTALL)
+    networking_match = re.search(
+        r"## Networking\s*\n+(.*?)(?=##|$)", analysis_text, re.IGNORECASE | re.DOTALL
+    )
     if networking_match:
         networking = networking_match.group(1).strip()
 
     # Extract data flow section
-    dataflow_match = re.search(r"## Data Flow\s*\n+(.*?)(?=##|$)", analysis_text, re.IGNORECASE | re.DOTALL)
+    dataflow_match = re.search(
+        r"## Data Flow\s*\n+(.*?)(?=##|$)", analysis_text, re.IGNORECASE | re.DOTALL
+    )
     if dataflow_match:
         data_flow = dataflow_match.group(1).strip()
 
     # Extract additional requirements
-    additional_match = re.search(r"## Additional Requirements\s*\n+(.*?)(?=##|$)", analysis_text, re.IGNORECASE | re.DOTALL)
+    additional_match = re.search(
+        r"## Additional Requirements\s*\n+(.*?)(?=##|$)",
+        analysis_text,
+        re.IGNORECASE | re.DOTALL,
+    )
     if additional_match:
         additional_requirements = additional_match.group(1).strip()
 
@@ -435,6 +457,7 @@ async def run_image_generation(
         sessions[session_id]["status"] = "running"
 
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
         from terragen.vision import analyze_diagram, build_terraform_prompt
@@ -442,12 +465,14 @@ async def run_image_generation(
 
         # Check if we have pre-confirmed analysis (user already reviewed)
         if request.confirmed_analysis:
-            sessions[session_id]["logs"].append({
-                "timestamp": time.strftime("%H:%M:%S"),
-                "level": "info",
-                "agent": "VisionAgent",
-                "message": "Using confirmed requirements from diagram analysis",
-            })
+            sessions[session_id]["logs"].append(
+                {
+                    "timestamp": time.strftime("%H:%M:%S"),
+                    "level": "info",
+                    "agent": "VisionAgent",
+                    "message": "Using confirmed requirements from diagram analysis",
+                }
+            )
 
             # Build the Terraform prompt from the confirmed analysis
             terraform_prompt = build_terraform_prompt(
@@ -458,12 +483,14 @@ async def run_image_generation(
 
         else:
             # Run fresh diagram analysis
-            sessions[session_id]["logs"].append({
-                "timestamp": time.strftime("%H:%M:%S"),
-                "level": "info",
-                "agent": "VisionAgent",
-                "message": "Analyzing architecture diagram...",
-            })
+            sessions[session_id]["logs"].append(
+                {
+                    "timestamp": time.strftime("%H:%M:%S"),
+                    "level": "info",
+                    "agent": "VisionAgent",
+                    "message": "Analyzing architecture diagram...",
+                }
+            )
 
             # Run diagram analysis in executor (blocking call)
             loop = asyncio.get_event_loop()
@@ -472,15 +499,17 @@ async def run_image_generation(
                 lambda: analyze_diagram(
                     request.image_data,
                     request.additional_context,
-                )
+                ),
             )
 
-            sessions[session_id]["logs"].append({
-                "timestamp": time.strftime("%H:%M:%S"),
-                "level": "success",
-                "agent": "VisionAgent",
-                "message": "Diagram analysis complete",
-            })
+            sessions[session_id]["logs"].append(
+                {
+                    "timestamp": time.strftime("%H:%M:%S"),
+                    "level": "success",
+                    "agent": "VisionAgent",
+                    "message": "Diagram analysis complete",
+                }
+            )
 
             terraform_prompt = analysis_result["prompt"]
             sessions[session_id]["diagram_analysis"] = analysis_result["analysis"]
@@ -530,7 +559,10 @@ async def run_image_generation(
                 agent_name = updates["completed_agent"]
                 if agent_name not in sessions[session_id]["completed_agents"]:
                     sessions[session_id]["completed_agents"].append(agent_name)
-                if "failed_agents" in sessions[session_id] and agent_name in sessions[session_id]["failed_agents"]:
+                if (
+                    "failed_agents" in sessions[session_id]
+                    and agent_name in sessions[session_id]["failed_agents"]
+                ):
                     sessions[session_id]["failed_agents"].remove(agent_name)
             elif "skipped_agent" in updates:
                 if "skipped_agents" not in sessions[session_id]:
@@ -540,7 +572,10 @@ async def run_image_generation(
                 if "failed_agents" not in sessions[session_id]:
                     sessions[session_id]["failed_agents"] = []
                 agent_name = updates["failed_agent"]
-                if "completed_agents" not in sessions[session_id] or agent_name not in sessions[session_id]["completed_agents"]:
+                if (
+                    "completed_agents" not in sessions[session_id]
+                    or agent_name not in sessions[session_id]["completed_agents"]
+                ):
                     if agent_name not in sessions[session_id]["failed_agents"]:
                         sessions[session_id]["failed_agents"].append(agent_name)
             else:
@@ -576,19 +611,23 @@ async def run_image_generation(
             }
             for e in context.validation_errors
         ]
-        sessions[session_id]["cost_estimate"] = {
-            "monthly": context.total_monthly_cost,
-            "yearly": context.total_yearly_cost,
-            "breakdown": [
-                {
-                    "resource": c.resource_name,
-                    "type": c.resource_type,
-                    "monthly": c.monthly_cost,
-                    "yearly": c.yearly_cost,
-                }
-                for c in context.cost_breakdown
-            ],
-        } if context.cost_estimated else None
+        sessions[session_id]["cost_estimate"] = (
+            {
+                "monthly": context.total_monthly_cost,
+                "yearly": context.total_yearly_cost,
+                "breakdown": [
+                    {
+                        "resource": c.resource_name,
+                        "type": c.resource_type,
+                        "monthly": c.monthly_cost,
+                        "yearly": c.yearly_cost,
+                    }
+                    for c in context.cost_breakdown
+                ],
+            }
+            if context.cost_estimated
+            else None
+        )
         sessions[session_id]["pipeline_summary"] = context.to_dict()
 
         if context.pipeline_failed:
@@ -638,6 +677,7 @@ async def run_generation(
 
         # Import from terragen core
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
         from terragen.config import PROVIDER_REGIONS
@@ -659,7 +699,9 @@ async def run_generation(
         backend_config = None
         if backend != "local":
             clarifications["backend"] = backend
-            clarifications["backend_instruction"] = f"Configure Terraform to use {backend} backend for state storage"
+            clarifications["backend_instruction"] = (
+                f"Configure Terraform to use {backend} backend for state storage"
+            )
             # Use full backend config if provided, otherwise just type
             if request.backendConfig:
                 backend_config = request.backendConfig.model_dump(exclude_none=True)
@@ -704,20 +746,28 @@ async def run_generation(
                     if agent_name not in sessions[session_id]["completed_agents"]:
                         sessions[session_id]["completed_agents"].append(agent_name)
                     # Remove from failed_agents if it was there (succeeded on retry)
-                    if "failed_agents" in sessions[session_id] and agent_name in sessions[session_id]["failed_agents"]:
+                    if (
+                        "failed_agents" in sessions[session_id]
+                        and agent_name in sessions[session_id]["failed_agents"]
+                    ):
                         sessions[session_id]["failed_agents"].remove(agent_name)
                 elif "skipped_agent" in updates:
                     # Track skipped agents
                     if "skipped_agents" not in sessions[session_id]:
                         sessions[session_id]["skipped_agents"] = []
-                    sessions[session_id]["skipped_agents"].append(updates["skipped_agent"])
+                    sessions[session_id]["skipped_agents"].append(
+                        updates["skipped_agent"]
+                    )
                 elif "failed_agent" in updates:
                     # Track failed agents (only if not already completed)
                     if "failed_agents" not in sessions[session_id]:
                         sessions[session_id]["failed_agents"] = []
                     agent_name = updates["failed_agent"]
                     # Don't add if already completed (edge case)
-                    if "completed_agents" not in sessions[session_id] or agent_name not in sessions[session_id]["completed_agents"]:
+                    if (
+                        "completed_agents" not in sessions[session_id]
+                        or agent_name not in sessions[session_id]["completed_agents"]
+                    ):
                         if agent_name not in sessions[session_id]["failed_agents"]:
                             sessions[session_id]["failed_agents"].append(agent_name)
                 else:
@@ -754,19 +804,23 @@ async def run_generation(
                 }
                 for e in context.validation_errors
             ]
-            sessions[session_id]["cost_estimate"] = {
-                "monthly": context.total_monthly_cost,
-                "yearly": context.total_yearly_cost,
-                "breakdown": [
-                    {
-                        "resource": c.resource_name,
-                        "type": c.resource_type,
-                        "monthly": c.monthly_cost,
-                        "yearly": c.yearly_cost,
-                    }
-                    for c in context.cost_breakdown
-                ],
-            } if context.cost_estimated else None
+            sessions[session_id]["cost_estimate"] = (
+                {
+                    "monthly": context.total_monthly_cost,
+                    "yearly": context.total_yearly_cost,
+                    "breakdown": [
+                        {
+                            "resource": c.resource_name,
+                            "type": c.resource_type,
+                            "monthly": c.monthly_cost,
+                            "yearly": c.yearly_cost,
+                        }
+                        for c in context.cost_breakdown
+                    ],
+                }
+                if context.cost_estimated
+                else None
+            )
             sessions[session_id]["pipeline_summary"] = context.to_dict()
 
             if context.pipeline_failed:
@@ -883,7 +937,9 @@ async def stream_generation(
 
             # Get new logs since last check
             all_logs = sessions[session_id].get("logs", [])
-            new_logs = all_logs[last_log_index:] if last_log_index < len(all_logs) else []
+            new_logs = (
+                all_logs[last_log_index:] if last_log_index < len(all_logs) else []
+            )
             last_log_index = len(all_logs)
 
             data = {
@@ -931,7 +987,9 @@ async def update_session_files(
         raise HTTPException(status_code=403, detail="Not authorized")
 
     if session["status"] not in ["completed", "completed_with_warnings"]:
-        raise HTTPException(status_code=400, detail="Can only update files in completed sessions")
+        raise HTTPException(
+            status_code=400, detail="Can only update files in completed sessions"
+        )
 
     # Update files in session
     sessions[session_id]["files"] = request.files

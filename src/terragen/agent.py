@@ -45,7 +45,9 @@ class TerraGenAgent:
         self.event_callback = event_callback
         self.preferred_provider = preferred_provider
 
-    def _emit_event(self, event_type: str, message: str, level: str = "info", details: str = None):
+    def _emit_event(
+        self, event_type: str, message: str, level: str = "info", details: str = None
+    ):
         """Emit an event to the callback if registered."""
         if self.event_callback:
             event = {
@@ -78,17 +80,25 @@ class TerraGenAgent:
             self._current_provider = response.provider
             self.total_input_tokens += response.usage.input_tokens
             self.total_output_tokens += response.usage.output_tokens
-            self.total_cache_creation_tokens += response.usage.cache_creation_input_tokens
+            self.total_cache_creation_tokens += (
+                response.usage.cache_creation_input_tokens
+            )
             self.total_cache_read_tokens += response.usage.cache_read_input_tokens
 
             # Log model info on first turn
             if turn == 0:
                 cache_info = ""
                 if response.usage.cache_read_input_tokens > 0:
-                    cache_info = f" (cache hit: {response.usage.cache_read_input_tokens} tokens)"
+                    cache_info = (
+                        f" (cache hit: {response.usage.cache_read_input_tokens} tokens)"
+                    )
                 elif response.usage.cache_creation_input_tokens > 0:
                     cache_info = f" (cache write: {response.usage.cache_creation_input_tokens} tokens)"
-                self._emit_event("model", f"Using {response.provider}/{response.model}{cache_info}", level="info")
+                self._emit_event(
+                    "model",
+                    f"Using {response.provider}/{response.model}{cache_info}",
+                    level="info",
+                )
 
             # Process response
             assistant_content = []
@@ -108,17 +118,19 @@ class TerraGenAgent:
 
                     # Build tool description for logging
                     if block.name == "write_file":
-                        path = block.input.get('path', '')
-                        filename = Path(path).name if path else 'unknown'
+                        path = block.input.get("path", "")
+                        filename = Path(path).name if path else "unknown"
                         console.print(f"[dim]  → {path}[/dim]")
-                        self._emit_event("tool", f"Writing file: {filename}", details=path)
+                        self._emit_event(
+                            "tool", f"Writing file: {filename}", details=path
+                        )
                     elif block.name == "run_command":
-                        cmd = block.input.get('command', '')[:60]
+                        cmd = block.input.get("command", "")[:60]
                         console.print(f"[dim]  → {cmd}...[/dim]")
                         self._emit_event("tool", f"Running: {cmd}")
                     elif block.name == "read_file":
-                        path = block.input.get('path', '')
-                        filename = Path(path).name if path else 'unknown'
+                        path = block.input.get("path", "")
+                        filename = Path(path).name if path else "unknown"
                         self._emit_event("tool", f"Reading file: {filename}")
                     elif block.name == "list_files":
                         self._emit_event("tool", "Listing files")
@@ -127,18 +139,22 @@ class TerraGenAgent:
 
                     result = execute_tool(block.name, block.input)
 
-                    assistant_content.append({
-                        "type": "tool_use",
-                        "id": block.id,
-                        "name": block.name,
-                        "input": block.input
-                    })
+                    assistant_content.append(
+                        {
+                            "type": "tool_use",
+                            "id": block.id,
+                            "name": block.name,
+                            "input": block.input,
+                        }
+                    )
 
-                    tool_results.append({
-                        "type": "tool_result",
-                        "tool_use_id": block.id,
-                        "content": result
-                    })
+                    tool_results.append(
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": result,
+                        }
+                    )
 
             self.messages.append({"role": "assistant", "content": assistant_content})
 
@@ -165,7 +181,9 @@ class TerraGenAgent:
 
         # Actual cost = base - savings + small write premium
         cache_write_premium = self.total_cache_creation_tokens * 3 * 0.25 / 1_000_000
-        actual_cost = base_input_cost + output_cost - cache_savings + cache_write_premium
+        actual_cost = (
+            base_input_cost + output_cost - cache_savings + cache_write_premium
+        )
 
         return {
             "input_tokens": self.total_input_tokens,
@@ -196,17 +214,21 @@ def run_agent(
     available = agent.client.get_available_providers()
     console.print(f"\n[dim]Available providers: {', '.join(available)}[/dim]")
     if event_callback:
-        event_callback({
-            "log": {
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "level": "info",
-                "message": f"Using LLM providers: {', '.join(available)}",
+        event_callback(
+            {
+                "log": {
+                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                    "level": "info",
+                    "message": f"Using LLM providers: {', '.join(available)}",
+                }
             }
-        })
+        )
     return agent.chat(prompt, max_turns)
 
 
-def run_interactive_session(initial_prompt: str, output_dir: Path, system_prompt: str = SYSTEM_PROMPT) -> None:
+def run_interactive_session(
+    initial_prompt: str, output_dir: Path, system_prompt: str = SYSTEM_PROMPT
+) -> None:
     """Run interactive session allowing continuous refinement."""
     agent = TerraGenAgent(output_dir, system_prompt)
 
@@ -225,7 +247,7 @@ def run_interactive_session(initial_prompt: str, output_dir: Path, system_prompt
         except (KeyboardInterrupt, EOFError):
             break
 
-        if user_input.lower() in ['quit', 'exit', 'q']:
+        if user_input.lower() in ["quit", "exit", "q"]:
             break
 
         if not user_input.strip():
@@ -236,4 +258,6 @@ def run_interactive_session(initial_prompt: str, output_dir: Path, system_prompt
 
     # Show usage
     usage = agent.get_usage()
-    console.print(f"\n[dim]Session usage: {usage['total_tokens']:,} tokens (~${usage['estimated_cost_usd']:.4f})[/dim]")
+    console.print(
+        f"\n[dim]Session usage: {usage['total_tokens']:,} tokens (~${usage['estimated_cost_usd']:.4f})[/dim]"
+    )

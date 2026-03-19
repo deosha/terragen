@@ -97,7 +97,9 @@ class PolicyAgent(BaseAgent):
                 data={"reason": "No policy files found"},
             )
 
-        self._log_info(f"Running custom policy checks ({len(policy_files)} policies)...")
+        self._log_info(
+            f"Running custom policy checks ({len(policy_files)} policies)..."
+        )
         issues = await self._run_conftest(output_dir)
 
         # Add issues to context
@@ -112,7 +114,9 @@ class PolicyAgent(BaseAgent):
             print_security_issues_summary(self.console, issues, show_table=True)
 
         if blocking_issues:
-            self._log_error(f"Found {len(blocking_issues)} blocking policy violation(s)")
+            self._log_error(
+                f"Found {len(blocking_issues)} blocking policy violation(s)"
+            )
             self._status = AgentStatus.FAILED
             return AgentResult(
                 status=AgentStatus.FAILED,
@@ -126,7 +130,9 @@ class PolicyAgent(BaseAgent):
             )
 
         if warning_issues:
-            self._log_warning(f"Found {len(warning_issues)} policy warning(s) (non-blocking)")
+            self._log_warning(
+                f"Found {len(warning_issues)} policy warning(s) (non-blocking)"
+            )
 
         self._log_success("Custom policy checks passed")
         self._status = AgentStatus.SUCCESS
@@ -177,9 +183,12 @@ class PolicyAgent(BaseAgent):
         try:
             # Build conftest command
             cmd = [
-                "conftest", "test",
-                "--policy", str(self.policy_dir),
-                "--output", "json",
+                "conftest",
+                "test",
+                "--policy",
+                str(self.policy_dir),
+                "--output",
+                "json",
                 "--all-namespaces",
             ] + [str(f) for f in tf_files]
 
@@ -270,7 +279,9 @@ class PolicyAgent(BaseAgent):
         rule_id = metadata.get("rule_id", "")
         if not rule_id:
             # Try to extract from namespace
-            namespace = file_result.get("namespace", "") if "file_result" in dir() else ""
+            namespace = (
+                file_result.get("namespace", "") if "file_result" in dir() else ""
+            )
             rule_id = f"POLICY_{namespace.upper()}" if namespace else "POLICY_CUSTOM"
 
         # Check for severity override in metadata

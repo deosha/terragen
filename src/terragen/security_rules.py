@@ -621,7 +621,9 @@ output "vpc_id" {
 """
 
 
-def build_security_prompt_section(provider: str, policies_dir: Optional[Path] = None) -> str:
+def build_security_prompt_section(
+    provider: str, policies_dir: Optional[Path] = None
+) -> str:
     """Build the complete security section for the system prompt.
 
     Args:
@@ -637,12 +639,14 @@ def build_security_prompt_section(provider: str, policies_dir: Optional[Path] = 
     sections.append(VALIDATION_RULES)
 
     # Add header for security
-    sections.append("""
+    sections.append(
+        """
 ## CRITICAL: Security Compliance Requirements
 
 Your generated code MUST pass security scans from tfsec, Checkov, and OPA/Conftest.
 Follow these rules to generate compliant code from the start - avoid the fix loop!
-""")
+"""
+    )
 
     # Add provider-specific rules
     sections.append(get_security_rules_for_provider(provider))
@@ -653,7 +657,8 @@ Follow these rules to generate compliant code from the start - avoid the fix loo
         sections.append(opa_policies)
 
     # Add final reminder - compact checklist
-    sections.append("""
+    sections.append(
+        """
 ## QUICK CHECKLIST (mandatory)
 **Validation**: versions.tf + providers.tf + variables.tf (all vars declared with type/description)
 **References**: Every resource you reference MUST be declared first (IAM roles, KMS keys, subnets)
@@ -666,6 +671,7 @@ Follow these rules to generate compliant code from the start - avoid the fix loo
 **Tags**: Environment + ManagedBy on all resources
 
 Generate secure code FIRST TIME - the fix loop is expensive!
-""")
+"""
+    )
 
     return "\n".join(sections)

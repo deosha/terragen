@@ -14,10 +14,10 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "path": {"type": "string", "description": "Absolute path to the file"},
-                "content": {"type": "string", "description": "Content to write"}
+                "content": {"type": "string", "description": "Content to write"},
             },
-            "required": ["path", "content"]
-        }
+            "required": ["path", "content"],
+        },
     },
     {
         "name": "read_file",
@@ -27,8 +27,8 @@ TOOLS = [
             "properties": {
                 "path": {"type": "string", "description": "Absolute path to the file"}
             },
-            "required": ["path"]
-        }
+            "required": ["path"],
+        },
     },
     {
         "name": "run_command",
@@ -37,10 +37,13 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "command": {"type": "string", "description": "Command to run"},
-                "cwd": {"type": "string", "description": "Working directory (optional)"}
+                "cwd": {
+                    "type": "string",
+                    "description": "Working directory (optional)",
+                },
             },
-            "required": ["command"]
-        }
+            "required": ["command"],
+        },
     },
     {
         "name": "list_files",
@@ -49,11 +52,15 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "path": {"type": "string", "description": "Directory path"},
-                "pattern": {"type": "string", "description": "Glob pattern (e.g., '*.tf')", "default": "*"}
+                "pattern": {
+                    "type": "string",
+                    "description": "Glob pattern (e.g., '*.tf')",
+                    "default": "*",
+                },
             },
-            "required": ["path"]
-        }
-    }
+            "required": ["path"],
+        },
+    },
 ]
 
 
@@ -84,7 +91,7 @@ def execute_tool(name: str, inputs: dict) -> str:
                 cwd=cwd,
                 capture_output=True,
                 text=True,
-                timeout=120
+                timeout=120,
             )
             output = result.stdout + result.stderr
             # Limit output

@@ -15,10 +15,15 @@ from rich.prompt import Prompt
 
 # Load .env file before anything else
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from .config import get_default_region
-from .generator import generate_terraform, generate_terraform_pipeline, AWS_CREDS_AVAILABLE
+from .generator import (
+    generate_terraform,
+    generate_terraform_pipeline,
+    AWS_CREDS_AVAILABLE,
+)
 from .modifier import modify_infrastructure
 from .questions import ask_clarifying_questions, ask_backend_config
 
@@ -33,23 +38,96 @@ def cli():
 
 
 @cli.command()
-@click.argument('prompt')
-@click.option('--output', '-o', default='./output', help='Output directory (e.g., ./infra, /tmp/tf)')
-@click.option('--provider', '-p', default='aws', type=click.Choice(['aws', 'gcp', 'azure']), help='Cloud provider: aws, gcp, azure')
-@click.option('--region', '-r', default=None, help='Cloud region (default: us-east-1 for AWS, us-central1 for GCP, eastus for Azure)')
-@click.option('--interactive', '-i', is_flag=True, help='Ask clarifying questions before generation')
-@click.option('--learn-from', '-l', type=click.Path(exists=True), help='Path to existing Terraform repo to learn patterns')
-@click.option('--chat', '-c', is_flag=True, help='Continue conversation for code refinement after generation')
-@click.option('--yes', '-y', is_flag=True, help='Skip confirmation prompt and proceed automatically')
-@click.option('--backend', '-b', type=click.Choice(['s3', 'gcs', 'azurerm', 'remote', 'local']), default='local', help='State backend: local, s3, gcs, azurerm, remote (Terraform Cloud)')
-@click.option('--modify', '-m', type=click.Path(exists=True), help='Path to existing infrastructure repo to modify')
-@click.option('--skip-clarify', is_flag=True, help='Skip clarification questions (auto-detect mode)')
-@click.option('--skip-cost', is_flag=True, help='Skip cost estimation')
-@click.option('--max-security-fixes', default=3, type=int, help='Maximum security fix attempts (default: 3)')
-@click.option('--pipeline/--no-pipeline', default=True, help='Use multi-agent pipeline (default: True)')
-def generate(prompt: str, output: str, provider: str, region: str, interactive: bool, learn_from: str,
-             chat: bool, yes: bool, backend: str, modify: str, skip_clarify: bool, skip_cost: bool,
-             max_security_fixes: int, pipeline: bool):
+@click.argument("prompt")
+@click.option(
+    "--output",
+    "-o",
+    default="./output",
+    help="Output directory (e.g., ./infra, /tmp/tf)",
+)
+@click.option(
+    "--provider",
+    "-p",
+    default="aws",
+    type=click.Choice(["aws", "gcp", "azure"]),
+    help="Cloud provider: aws, gcp, azure",
+)
+@click.option(
+    "--region",
+    "-r",
+    default=None,
+    help="Cloud region (default: us-east-1 for AWS, us-central1 for GCP, eastus for Azure)",
+)
+@click.option(
+    "--interactive",
+    "-i",
+    is_flag=True,
+    help="Ask clarifying questions before generation",
+)
+@click.option(
+    "--learn-from",
+    "-l",
+    type=click.Path(exists=True),
+    help="Path to existing Terraform repo to learn patterns",
+)
+@click.option(
+    "--chat",
+    "-c",
+    is_flag=True,
+    help="Continue conversation for code refinement after generation",
+)
+@click.option(
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Skip confirmation prompt and proceed automatically",
+)
+@click.option(
+    "--backend",
+    "-b",
+    type=click.Choice(["s3", "gcs", "azurerm", "remote", "local"]),
+    default="local",
+    help="State backend: local, s3, gcs, azurerm, remote (Terraform Cloud)",
+)
+@click.option(
+    "--modify",
+    "-m",
+    type=click.Path(exists=True),
+    help="Path to existing infrastructure repo to modify",
+)
+@click.option(
+    "--skip-clarify",
+    is_flag=True,
+    help="Skip clarification questions (auto-detect mode)",
+)
+@click.option("--skip-cost", is_flag=True, help="Skip cost estimation")
+@click.option(
+    "--max-security-fixes",
+    default=3,
+    type=int,
+    help="Maximum security fix attempts (default: 3)",
+)
+@click.option(
+    "--pipeline/--no-pipeline",
+    default=True,
+    help="Use multi-agent pipeline (default: True)",
+)
+def generate(
+    prompt: str,
+    output: str,
+    provider: str,
+    region: str,
+    interactive: bool,
+    learn_from: str,
+    chat: bool,
+    yes: bool,
+    backend: str,
+    modify: str,
+    skip_clarify: bool,
+    skip_cost: bool,
+    max_security_fixes: int,
+    pipeline: bool,
+):
     """Generate Terraform code from natural language.
 
     The multi-agent pipeline includes:
@@ -72,14 +150,18 @@ def generate(prompt: str, output: str, provider: str, region: str, interactive: 
         region = get_default_region(provider)
 
     # Check if at least one LLM provider API key is available
-    has_api_key = any([
-        os.environ.get('ANTHROPIC_API_KEY'),
-        os.environ.get('XAI_API_KEY'),
-        os.environ.get('OPENAI_API_KEY'),
-    ])
+    has_api_key = any(
+        [
+            os.environ.get("ANTHROPIC_API_KEY"),
+            os.environ.get("XAI_API_KEY"),
+            os.environ.get("OPENAI_API_KEY"),
+        ]
+    )
     if not has_api_key:
         console.print("[red]Error: No LLM API key configured[/red]")
-        console.print("Set at least one of: ANTHROPIC_API_KEY, XAI_API_KEY, OPENAI_API_KEY")
+        console.print(
+            "Set at least one of: ANTHROPIC_API_KEY, XAI_API_KEY, OPENAI_API_KEY"
+        )
         return
 
     # If --modify is specified, use modification mode
@@ -100,31 +182,39 @@ def generate(prompt: str, output: str, provider: str, region: str, interactive: 
 
     # Configure backend if not local
     backend_config = None
-    if backend != 'local':
+    if backend != "local":
         backend_config = ask_backend_config(backend, provider, region)
 
     # Show summary and ask for confirmation unless --yes flag
     if not yes:
         while True:
-            backend_display = backend if backend == 'local' else f"{backend} ({backend_config.get('bucket', backend_config.get('organization', ''))})"
-            pipeline_status = "[green]Enabled[/green]" if pipeline else "[dim]Disabled[/dim]"
+            backend_display = (
+                backend
+                if backend == "local"
+                else f"{backend} ({backend_config.get('bucket', backend_config.get('organization', ''))})"
+            )
+            pipeline_status = (
+                "[green]Enabled[/green]" if pipeline else "[dim]Disabled[/dim]"
+            )
 
-            console.print(Panel.fit(
-                f"[bold blue]TerraGen - Generation Summary[/bold blue]\n\n"
-                f"[green]Request:[/green] {prompt}\n"
-                f"[green]Provider:[/green] {provider}\n"
-                f"[green]Region:[/green] {region}\n"
-                f"[green]Output:[/green] {output_path}\n"
-                f"[green]Backend:[/green] {backend_display}\n"
-                f"[green]AWS Credentials:[/green] {'Available' if AWS_CREDS_AVAILABLE else 'Not found'}\n"
-                f"[green]Learn from:[/green] {learn_path or 'None'}\n"
-                f"[green]Chat mode:[/green] {'Yes' if chat else 'No'}\n"
-                f"[green]Multi-Agent Pipeline:[/green] {pipeline_status}\n"
-                f"[green]Skip Clarify:[/green] {'Yes' if skip_clarify else 'No (auto-detect)'}\n"
-                f"[green]Skip Cost:[/green] {'Yes' if skip_cost else 'No'}\n"
-                f"[green]Max Security Fixes:[/green] {max_security_fixes}",
-                title="Confirm"
-            ))
+            console.print(
+                Panel.fit(
+                    f"[bold blue]TerraGen - Generation Summary[/bold blue]\n\n"
+                    f"[green]Request:[/green] {prompt}\n"
+                    f"[green]Provider:[/green] {provider}\n"
+                    f"[green]Region:[/green] {region}\n"
+                    f"[green]Output:[/green] {output_path}\n"
+                    f"[green]Backend:[/green] {backend_display}\n"
+                    f"[green]AWS Credentials:[/green] {'Available' if AWS_CREDS_AVAILABLE else 'Not found'}\n"
+                    f"[green]Learn from:[/green] {learn_path or 'None'}\n"
+                    f"[green]Chat mode:[/green] {'Yes' if chat else 'No'}\n"
+                    f"[green]Multi-Agent Pipeline:[/green] {pipeline_status}\n"
+                    f"[green]Skip Clarify:[/green] {'Yes' if skip_clarify else 'No (auto-detect)'}\n"
+                    f"[green]Skip Cost:[/green] {'Yes' if skip_cost else 'No'}\n"
+                    f"[green]Max Security Fixes:[/green] {max_security_fixes}",
+                    title="Confirm",
+                )
+            )
 
             console.print("\n[bold]Options:[/bold]")
             console.print("  [green]y[/green] - Proceed with generation")
@@ -141,7 +231,9 @@ def generate(prompt: str, output: str, provider: str, region: str, interactive: 
             elif choice == "m":
                 console.print("\n[bold]Current requirements:[/bold]")
                 console.print(f"  {prompt}\n")
-                new_prompt = Prompt.ask("[yellow]Enter new/modified requirements[/yellow]")
+                new_prompt = Prompt.ask(
+                    "[yellow]Enter new/modified requirements[/yellow]"
+                )
                 if new_prompt.strip():
                     prompt = new_prompt.strip()
                 console.print()  # Blank line before showing updated summary
@@ -149,26 +241,37 @@ def generate(prompt: str, output: str, provider: str, region: str, interactive: 
     # Use pipeline or legacy generator
     if pipeline:
         # Run the multi-agent pipeline
-        asyncio.run(generate_terraform_pipeline(
-            prompt=prompt,
-            output_dir=output_path,
-            provider=provider,
-            region=region,
-            clarifications=clarifications,
-            learn_from=learn_path,
-            chat_mode=chat,
-            backend_config=backend_config,
-            skip_clarify=skip_clarify,
-            skip_cost=skip_cost,
-            max_security_fixes=max_security_fixes,
-        ))
+        asyncio.run(
+            generate_terraform_pipeline(
+                prompt=prompt,
+                output_dir=output_path,
+                provider=provider,
+                region=region,
+                clarifications=clarifications,
+                learn_from=learn_path,
+                chat_mode=chat,
+                backend_config=backend_config,
+                skip_clarify=skip_clarify,
+                skip_cost=skip_cost,
+                max_security_fixes=max_security_fixes,
+            )
+        )
     else:
         # Use legacy single-agent generator
-        generate_terraform(prompt, output_path, provider, region, clarifications, learn_path, chat, backend_config)
+        generate_terraform(
+            prompt,
+            output_path,
+            provider,
+            region,
+            clarifications,
+            learn_path,
+            chat,
+            backend_config,
+        )
 
 
 @cli.command()
-@click.argument('directory', type=click.Path(exists=True), default='.')
+@click.argument("directory", type=click.Path(exists=True), default=".")
 def validate(directory: str):
     """Validate Terraform code in directory."""
 
@@ -180,13 +283,13 @@ def validate(directory: str):
         ("Validate", "terraform validate"),
     ]
 
-    if shutil.which('tflint'):
+    if shutil.which("tflint"):
         checks.append(("TFLint", "tflint"))
-    if shutil.which('tfsec'):
+    if shutil.which("tfsec"):
         checks.append(("TFSec", "tfsec ."))
-    if shutil.which('checkov'):
+    if shutil.which("checkov"):
         checks.append(("Checkov", "checkov -d . --quiet"))
-    if shutil.which('conftest'):
+    if shutil.which("conftest"):
         # Check if policies directory exists
         policies_dir = Path(__file__).parent.parent.parent / "policies"
         if policies_dir.exists():
@@ -194,8 +297,7 @@ def validate(directory: str):
 
     for name, cmd in checks:
         result = subprocess.run(
-            f"cd {directory} && {cmd}",
-            shell=True, capture_output=True, text=True
+            f"cd {directory} && {cmd}", shell=True, capture_output=True, text=True
         )
         if result.returncode == 0:
             console.print(f"[green]✓ {name}[/green]")
@@ -206,11 +308,11 @@ def validate(directory: str):
 
 
 @cli.command()
-@click.argument('directory', type=click.Path(exists=True), default='.')
+@click.argument("directory", type=click.Path(exists=True), default=".")
 def cost(directory: str):
     """Estimate infrastructure costs with Infracost."""
 
-    if not shutil.which('infracost'):
+    if not shutil.which("infracost"):
         console.print("[red]Infracost not installed.[/red]")
         console.print("Install: brew install infracost")
         return
@@ -219,7 +321,9 @@ def cost(directory: str):
 
     result = subprocess.run(
         f"cd {directory} && infracost breakdown --path . --format table",
-        shell=True, capture_output=True, text=True
+        shell=True,
+        capture_output=True,
+        text=True,
     )
 
     if result.returncode == 0:
@@ -229,7 +333,7 @@ def cost(directory: str):
 
 
 @cli.command()
-@click.argument('directory', type=click.Path(exists=True), default='.')
+@click.argument("directory", type=click.Path(exists=True), default=".")
 def security(directory: str):
     """Run security scans on Terraform code."""
 
@@ -237,17 +341,17 @@ def security(directory: str):
 
     scans = []
 
-    if shutil.which('tfsec'):
+    if shutil.which("tfsec"):
         scans.append(("tfsec", "tfsec . --soft-fail"))
     else:
         console.print("[dim]tfsec not installed (brew install tfsec)[/dim]")
 
-    if shutil.which('checkov'):
+    if shutil.which("checkov"):
         scans.append(("Checkov", "checkov -d . --soft-fail"))
     else:
         console.print("[dim]checkov not installed (brew install checkov)[/dim]")
 
-    if shutil.which('conftest'):
+    if shutil.which("conftest"):
         policies_dir = Path(__file__).parent.parent.parent / "policies"
         if policies_dir.exists():
             scans.append(("Conftest", f"conftest test --policy {policies_dir} *.tf"))
@@ -265,8 +369,7 @@ def security(directory: str):
     for name, cmd in scans:
         console.print(f"[bold cyan]>>> {name}[/bold cyan]")
         result = subprocess.run(
-            f"cd {directory} && {cmd}",
-            shell=True, capture_output=True, text=True
+            f"cd {directory} && {cmd}", shell=True, capture_output=True, text=True
         )
         if result.stdout:
             console.print(result.stdout)
@@ -280,5 +383,5 @@ def main():
     cli()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

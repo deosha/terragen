@@ -95,7 +95,10 @@ async def validate(
 
         # Check format
         fmt_process = await asyncio.create_subprocess_exec(
-            "terraform", "fmt", "-check", "-diff",
+            "terraform",
+            "fmt",
+            "-check",
+            "-diff",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -108,7 +111,9 @@ async def validate(
 
         # Initialize
         init_process = await asyncio.create_subprocess_exec(
-            "terraform", "init", "-backend=false",
+            "terraform",
+            "init",
+            "-backend=false",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -126,7 +131,9 @@ async def validate(
 
         # Validate
         validate_process = await asyncio.create_subprocess_exec(
-            "terraform", "validate", "-json",
+            "terraform",
+            "validate",
+            "-json",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -178,7 +185,9 @@ async def plan(
 
         # Initialize
         init_process = await asyncio.create_subprocess_exec(
-            "terraform", "init", "-backend=false",
+            "terraform",
+            "init",
+            "-backend=false",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -193,7 +202,10 @@ async def plan(
 
         # Run plan with JSON output
         plan_process = await asyncio.create_subprocess_exec(
-            "terraform", "plan", "-no-color", "-out=tfplan",
+            "terraform",
+            "plan",
+            "-no-color",
+            "-out=tfplan",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -208,7 +220,10 @@ async def plan(
 
         # Get plan in JSON format for resource changes
         show_process = await asyncio.create_subprocess_exec(
-            "terraform", "show", "-json", "tfplan",
+            "terraform",
+            "show",
+            "-json",
+            "tfplan",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -222,12 +237,14 @@ async def plan(
                 for change in plan_json.get("resource_changes", []):
                     actions = change.get("change", {}).get("actions", [])
                     if actions and actions != ["no-op"]:
-                        resource_changes.append({
-                            "address": change.get("address", ""),
-                            "type": change.get("type", ""),
-                            "name": change.get("name", ""),
-                            "actions": actions,
-                        })
+                        resource_changes.append(
+                            {
+                                "address": change.get("address", ""),
+                                "type": change.get("type", ""),
+                                "name": change.get("name", ""),
+                                "actions": actions,
+                            }
+                        )
             except json.JSONDecodeError:
                 pass
 
@@ -264,7 +281,9 @@ async def estimate_cost(
         # Initialize terraform first
         tf_env = {**os.environ, "TF_LOG": ""}
         init_process = await asyncio.create_subprocess_exec(
-            "terraform", "init", "-backend=false",
+            "terraform",
+            "init",
+            "-backend=false",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -275,9 +294,12 @@ async def estimate_cost(
         # Run infracost
         cost_env = {**os.environ, "INFRACOST_API_KEY": settings.infracost_api_key}
         cost_process = await asyncio.create_subprocess_exec(
-            "infracost", "breakdown",
-            "--path", str(tmppath),
-            "--format", "json",
+            "infracost",
+            "breakdown",
+            "--path",
+            str(tmppath),
+            "--format",
+            "json",
             cwd=str(tmppath),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -299,10 +321,12 @@ async def estimate_cost(
             for project in result.get("projects", []):
                 for resource in project.get("breakdown", {}).get("resources", []):
                     if float(resource.get("monthlyCost", 0) or 0) > 0:
-                        breakdown.append({
-                            "name": resource["name"],
-                            "monthly_cost": resource["monthlyCost"],
-                        })
+                        breakdown.append(
+                            {
+                                "name": resource["name"],
+                                "monthly_cost": resource["monthlyCost"],
+                            }
+                        )
 
             return CostResponse(
                 monthly_cost=f"${monthly_cost}",
@@ -338,7 +362,10 @@ async def security_scan(
         # 1. Run tfsec
         try:
             tfsec_process = await asyncio.create_subprocess_exec(
-                "tfsec", str(tmppath), "--format", "json",
+                "tfsec",
+                str(tmppath),
+                "--format",
+                "json",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -354,14 +381,16 @@ async def security_scan(
                         # Get just filename from path
                         if "/" in file_name:
                             file_name = file_name.split("/")[-1]
-                        issues.append({
-                            "severity": severity,
-                            "rule_id": finding.get("rule_id", ""),
-                            "description": finding.get("description", ""),
-                            "file_path": file_name,
-                            "line_number": location.get("start_line", 0),
-                            "scanner": "tfsec",
-                        })
+                        issues.append(
+                            {
+                                "severity": severity,
+                                "rule_id": finding.get("rule_id", ""),
+                                "description": finding.get("description", ""),
+                                "file_path": file_name,
+                                "line_number": location.get("start_line", 0),
+                                "scanner": "tfsec",
+                            }
+                        )
                         if severity in ["CRITICAL", "HIGH"]:
                             failed += 1
                         else:
@@ -374,7 +403,12 @@ async def security_scan(
         # 2. Run checkov
         try:
             checkov_process = await asyncio.create_subprocess_exec(
-                "checkov", "-d", str(tmppath), "-o", "json", "--quiet",
+                "checkov",
+                "-d",
+                str(tmppath),
+                "-o",
+                "json",
+                "--quiet",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -391,22 +425,32 @@ async def security_scan(
 
                     for result in results:
                         if isinstance(result, dict):
-                            for check in result.get("results", {}).get("failed_checks", []):
-                                severity = check.get("check_result", {}).get("severity", "MEDIUM")
+                            for check in result.get("results", {}).get(
+                                "failed_checks", []
+                            ):
+                                severity = check.get("check_result", {}).get(
+                                    "severity", "MEDIUM"
+                                )
                                 if not severity:
                                     severity = "MEDIUM"
                                 severity = severity.upper()
                                 file_path = check.get("file_path", "")
                                 if "/" in file_path:
                                     file_path = file_path.split("/")[-1]
-                                issues.append({
-                                    "severity": severity,
-                                    "rule_id": check.get("check_id", ""),
-                                    "description": check.get("check_name", ""),
-                                    "file_path": file_path,
-                                    "line_number": check.get("file_line_range", [0])[0] if check.get("file_line_range") else 0,
-                                    "scanner": "checkov",
-                                })
+                                issues.append(
+                                    {
+                                        "severity": severity,
+                                        "rule_id": check.get("check_id", ""),
+                                        "description": check.get("check_name", ""),
+                                        "file_path": file_path,
+                                        "line_number": (
+                                            check.get("file_line_range", [0])[0]
+                                            if check.get("file_line_range")
+                                            else 0
+                                        ),
+                                        "scanner": "checkov",
+                                    }
+                                )
                                 if severity in ["CRITICAL", "HIGH"]:
                                     failed += 1
                                 else:
@@ -419,7 +463,11 @@ async def security_scan(
         # 3. Run conftest (if policies exist)
         try:
             conftest_process = await asyncio.create_subprocess_exec(
-                "conftest", "test", str(tmppath), "--output", "json",
+                "conftest",
+                "test",
+                str(tmppath),
+                "--output",
+                "json",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -433,24 +481,30 @@ async def security_scan(
                         if "/" in file_path:
                             file_path = file_path.split("/")[-1]
                         for failure in result.get("failures", []):
-                            issues.append({
-                                "severity": "HIGH",
-                                "rule_id": "OPA-POLICY",
-                                "description": failure.get("msg", "Policy violation"),
-                                "file_path": file_path,
-                                "line_number": 0,
-                                "scanner": "conftest",
-                            })
+                            issues.append(
+                                {
+                                    "severity": "HIGH",
+                                    "rule_id": "OPA-POLICY",
+                                    "description": failure.get(
+                                        "msg", "Policy violation"
+                                    ),
+                                    "file_path": file_path,
+                                    "line_number": 0,
+                                    "scanner": "conftest",
+                                }
+                            )
                             failed += 1
                         for warning in result.get("warnings", []):
-                            issues.append({
-                                "severity": "MEDIUM",
-                                "rule_id": "OPA-POLICY",
-                                "description": warning.get("msg", "Policy warning"),
-                                "file_path": file_path,
-                                "line_number": 0,
-                                "scanner": "conftest",
-                            })
+                            issues.append(
+                                {
+                                    "severity": "MEDIUM",
+                                    "rule_id": "OPA-POLICY",
+                                    "description": warning.get("msg", "Policy warning"),
+                                    "file_path": file_path,
+                                    "line_number": 0,
+                                    "scanner": "conftest",
+                                }
+                            )
                             passed += 1
                 except json.JSONDecodeError:
                     pass
@@ -461,14 +515,16 @@ async def security_scan(
         if not issues and failed == 0 and passed == 0:
             for name, content in request.files.items():
                 if "0.0.0.0/0" in content:
-                    issues.append({
-                        "severity": "HIGH",
-                        "rule_id": "NETWORK-001",
-                        "description": "Potential open access (0.0.0.0/0) detected",
-                        "file_path": name,
-                        "line_number": 0,
-                        "scanner": "pattern",
-                    })
+                    issues.append(
+                        {
+                            "severity": "HIGH",
+                            "rule_id": "NETWORK-001",
+                            "description": "Potential open access (0.0.0.0/0) detected",
+                            "file_path": name,
+                            "line_number": 0,
+                            "scanner": "pattern",
+                        }
+                    )
                     failed += 1
 
         return SecurityResponse(

@@ -28,9 +28,11 @@ def learn_patterns_from_repo(repo_path: Path) -> str:
         if tf_file.name in key_files:
             try:
                 content = tf_file.read_text()
-                lines = content.split('\n')[:50]  # First 50 lines
-                patterns.append(f"\n### {tf_file.name}:\n```hcl\n{chr(10).join(lines)}\n```\n")
+                lines = content.split("\n")[:50]  # First 50 lines
+                patterns.append(
+                    f"\n### {tf_file.name}:\n```hcl\n{chr(10).join(lines)}\n```\n"
+                )
             except Exception:
                 pass
 
-    return ''.join(patterns)
+    return "".join(patterns)

@@ -74,30 +74,23 @@ class TestGenerateCommand:
         env.pop("XAI_API_KEY", None)
         env.pop("OPENAI_API_KEY", None)
 
-        result = runner.invoke(
-            cli,
-            ["generate", "test prompt", "-y"],
-            env=env
-        )
+        result = runner.invoke(cli, ["generate", "test prompt", "-y"], env=env)
 
         assert "No LLM API key" in result.output or "API key" in result.output
 
     def test_generate_provider_choices(self, runner):
         """Generate should only accept valid providers."""
-        result = runner.invoke(
-            cli,
-            ["generate", "test", "-p", "invalid_provider"]
-        )
+        result = runner.invoke(cli, ["generate", "test", "-p", "invalid_provider"])
 
         assert result.exit_code != 0
-        assert "invalid_provider" in result.output.lower() or "invalid" in result.output.lower()
+        assert (
+            "invalid_provider" in result.output.lower()
+            or "invalid" in result.output.lower()
+        )
 
     def test_generate_backend_choices(self, runner):
         """Generate should only accept valid backends."""
-        result = runner.invoke(
-            cli,
-            ["generate", "test", "-b", "invalid_backend"]
-        )
+        result = runner.invoke(cli, ["generate", "test", "-b", "invalid_backend"])
 
         assert result.exit_code != 0
 

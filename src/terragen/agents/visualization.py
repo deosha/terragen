@@ -49,7 +49,9 @@ STATUS_ICONS = {
 }
 
 
-def create_security_issues_table(issues: list[SecurityIssue], title: str = "Security Issues") -> Table:
+def create_security_issues_table(
+    issues: list[SecurityIssue], title: str = "Security Issues"
+) -> Table:
     """Create a Rich table displaying security issues.
 
     Args:
@@ -82,7 +84,11 @@ def create_security_issues_table(issues: list[SecurityIssue], title: str = "Secu
         table.add_row(
             Text(issue.severity.value, style=severity_style),
             issue.rule_id,
-            issue.description[:40] + "..." if len(issue.description) > 40 else issue.description,
+            (
+                issue.description[:40] + "..."
+                if len(issue.description) > 40
+                else issue.description
+            ),
             f"{issue.file_path}:{issue.line_number}",
             issue.scanner,
         )
@@ -136,7 +142,11 @@ def create_cost_breakdown_table(
     Returns:
         Rich Table object.
     """
-    table = Table(title="Infrastructure Cost Estimate", show_header=True, header_style="bold green")
+    table = Table(
+        title="Infrastructure Cost Estimate",
+        show_header=True,
+        header_style="bold green",
+    )
 
     table.add_column("Resource", style="bold", width=25)
     table.add_column("Type", style="cyan", width=15)
@@ -297,7 +307,9 @@ def create_pipeline_summary(context: PipelineContext) -> Panel:
     if context.pipeline_completed and not context.pipeline_failed:
         lines.append("[bold green]✓ Pipeline completed successfully[/bold green]")
     elif context.pipeline_failed:
-        lines.append(f"[bold red]✗ Pipeline failed: {context.failure_reason}[/bold red]")
+        lines.append(
+            f"[bold red]✗ Pipeline failed: {context.failure_reason}[/bold red]"
+        )
     else:
         lines.append("[yellow]Pipeline in progress...[/yellow]")
 
@@ -316,7 +328,9 @@ def create_pipeline_summary(context: PipelineContext) -> Panel:
     if context.validation_passed:
         lines.append("[green]✓ Validation passed[/green]")
     elif context.validation_errors:
-        lines.append(f"[red]✗ Validation errors: {len(context.validation_errors)}[/red]")
+        lines.append(
+            f"[red]✗ Validation errors: {len(context.validation_errors)}[/red]"
+        )
 
     # Security
     blocking = context.get_blocking_issues()
@@ -333,7 +347,9 @@ def create_pipeline_summary(context: PipelineContext) -> Panel:
 
     # Fix attempts
     if context.security_fix_attempts > 0:
-        lines.append(f"[dim]Fix attempts: {context.security_fix_attempts}/{context.max_security_fix_attempts}[/dim]")
+        lines.append(
+            f"[dim]Fix attempts: {context.security_fix_attempts}/{context.max_security_fix_attempts}[/dim]"
+        )
 
     # Cost
     if context.cost_estimated:
@@ -342,7 +358,11 @@ def create_pipeline_summary(context: PipelineContext) -> Panel:
         lines.append(f"[green]Yearly Cost:[/green] ${context.total_yearly_cost:,.2f}")
 
     content = "\n".join(lines)
-    border_color = "green" if context.pipeline_completed and not context.pipeline_failed else "red" if context.pipeline_failed else "yellow"
+    border_color = (
+        "green"
+        if context.pipeline_completed and not context.pipeline_failed
+        else "red" if context.pipeline_failed else "yellow"
+    )
 
     return Panel(content, title="Pipeline Summary", border_style=border_color)
 
@@ -371,7 +391,9 @@ def print_security_issues_summary(
         console.print()
 
     if blocking:
-        console.print(f"[bold red]Blocking issues (CRITICAL/HIGH): {len(blocking)}[/bold red]")
+        console.print(
+            f"[bold red]Blocking issues (CRITICAL/HIGH): {len(blocking)}[/bold red]"
+        )
     if warnings:
         console.print(f"[yellow]Warnings (MEDIUM/LOW/INFO): {len(warnings)}[/yellow]")
 

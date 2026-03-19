@@ -21,14 +21,16 @@ from typing import Optional
 
 class ComplexityTier(Enum):
     """Complexity tiers for model selection."""
-    SIMPLE = "simple"      # Score 0-30
-    MEDIUM = "medium"      # Score 31-70
-    COMPLEX = "complex"    # Score 71-100
+
+    SIMPLE = "simple"  # Score 0-30
+    MEDIUM = "medium"  # Score 31-70
+    COMPLEX = "complex"  # Score 71-100
 
 
 @dataclass
 class ModelConfig:
     """Configuration for a model."""
+
     provider: str
     model: str
     tier: ComplexityTier
@@ -39,6 +41,7 @@ class ModelConfig:
 @dataclass
 class ClassificationResult:
     """Result of prompt classification."""
+
     score: int  # 0-100
     tier: ComplexityTier
     reasons: list[str]
@@ -61,7 +64,9 @@ MODEL_TIERS: dict[ComplexityTier, list[ModelConfig]] = {
         ModelConfig("openai", "gpt-4o", ComplexityTier.MEDIUM, 2.50, 10.0),
     ],
     ComplexityTier.COMPLEX: [
-        ModelConfig("anthropic", "claude-sonnet-4-20250514", ComplexityTier.COMPLEX, 3.0, 15.0),
+        ModelConfig(
+            "anthropic", "claude-sonnet-4-20250514", ComplexityTier.COMPLEX, 3.0, 15.0
+        ),
         # Grok 4.1 - most intelligent, #1 on LMArena
         ModelConfig("xai", "grok-4-1", ComplexityTier.COMPLEX, 3.0, 15.0),
         ModelConfig("openai", "gpt-4o", ComplexityTier.COMPLEX, 2.50, 10.0),
@@ -79,27 +84,21 @@ COMPLEX_RESOURCES = {
     # Kubernetes
     r"\b(eks|gke|aks|kubernetes|k8s)\b": 25,
     r"\b(helm|istio|service\s*mesh)\b": 20,
-
     # Databases - managed
     r"\b(rds|aurora|documentdb|dynamodb|cloud\s*sql|cosmos\s*db)\b": 15,
     r"\b(elasticache|redis|memcached)\b": 12,
-
     # Networking - complex
     r"\b(transit\s*gateway|direct\s*connect|vpn|peering)\b": 20,
     r"\b(load\s*balancer|alb|nlb|elb)\b": 10,
     r"\b(cloudfront|cdn|waf)\b": 12,
-
     # Serverless - complex patterns
     r"\b(step\s*functions?|eventbridge|sqs|sns|kinesis)\b": 15,
     r"\b(api\s*gateway|apigw)\b": 12,
-
     # Security/Identity
     r"\b(cognito|auth0|identity|iam\s*role|service\s*account)\b": 10,
     r"\b(secrets?\s*manager|parameter\s*store|kms)\b": 10,
-
     # CI/CD
     r"\b(codepipeline|codebuild|github\s*actions?)\b": 12,
-
     # Multi-region/HA
     r"\b(multi[_-]?(az|region)|disaster\s*recovery|dr)\b": 20,
     r"\b(global|cross[_-]?region|replication)\b": 15,
@@ -131,15 +130,12 @@ COMPLEXITY_MODIFIERS = {
     r"\b(production|prod)\b": 15,
     r"\b(high\s*availability|ha|redundant)\b": 15,
     r"\b(auto[_-]?scaling|scale)\b": 10,
-
     # Security requirements
     r"\b(complian(ce|t)|hipaa|pci|sox|gdpr)\b": 20,
     r"\b(encrypt(ion|ed)?|secure|hardened)\b": 5,
-
     # Environment complexity
     r"\b(multi[_-]?tenant|saas)\b": 15,
     r"\b(microservice|distributed)\b": 12,
-
     # Simplicity indicators (negative)
     r"\b(simple|basic|minimal|demo|test|dev)\b": -10,
     r"\b(single|one|just)\b": -5,
@@ -276,8 +272,7 @@ class ModelRouter:
         # Filter by available providers
         if self.available_providers:
             available_models = [
-                m for m in models
-                if m.provider in self.available_providers
+                m for m in models if m.provider in self.available_providers
             ]
             if available_models:
                 models = available_models
@@ -318,8 +313,7 @@ class ModelRouter:
             # Filter by available providers
             if self.available_providers:
                 available_models = [
-                    m for m in models
-                    if m.provider in self.available_providers
+                    m for m in models if m.provider in self.available_providers
                 ]
                 if available_models:
                     models = available_models
@@ -361,15 +355,15 @@ def estimate_cost_savings(
 
     # Calculate costs
     selected_cost = (
-        model.cost_per_1m_input * estimated_input_tokens / 1_000_000 +
-        model.cost_per_1m_output * estimated_output_tokens / 1_000_000
+        model.cost_per_1m_input * estimated_input_tokens / 1_000_000
+        + model.cost_per_1m_output * estimated_output_tokens / 1_000_000
     )
 
     # Compare to always using Claude Sonnet
     sonnet = MODEL_TIERS[ComplexityTier.COMPLEX][0]
     sonnet_cost = (
-        sonnet.cost_per_1m_input * estimated_input_tokens / 1_000_000 +
-        sonnet.cost_per_1m_output * estimated_output_tokens / 1_000_000
+        sonnet.cost_per_1m_input * estimated_input_tokens / 1_000_000
+        + sonnet.cost_per_1m_output * estimated_output_tokens / 1_000_000
     )
 
     savings = sonnet_cost - selected_cost

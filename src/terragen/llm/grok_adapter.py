@@ -21,7 +21,9 @@ class GrokAdapter:
     PROVIDER_NAME = "xai"
     BASE_URL = "https://api.x.ai/v1"
 
-    def __init__(self, api_key: str | None = None, default_model: str = "grok-4-1-fast"):
+    def __init__(
+        self, api_key: str | None = None, default_model: str = "grok-4-1-fast"
+    ):
         """Initialize Grok adapter.
 
         Args:
@@ -48,7 +50,7 @@ class GrokAdapter:
         system: str | None = None,
         tools: list[dict[str, Any]] | None = None,
         timeout: float = 120.0,
-        **kwargs
+        **kwargs,
     ) -> LLMResponse:
         """Create a message using xAI Grok API.
 
@@ -90,9 +92,7 @@ class GrokAdapter:
         try:
             with httpx.Client(timeout=timeout) as client:
                 response = client.post(
-                    f"{self.BASE_URL}/chat/completions",
-                    headers=headers,
-                    json=payload
+                    f"{self.BASE_URL}/chat/completions", headers=headers, json=payload
                 )
 
                 if response.status_code == 401:
@@ -103,13 +103,13 @@ class GrokAdapter:
                     raise APIError(
                         f"Server error: {response.text}",
                         self.PROVIDER_NAME,
-                        response.status_code
+                        response.status_code,
                     )
                 elif response.status_code >= 400:
                     raise APIError(
                         f"Request error: {response.text}",
                         self.PROVIDER_NAME,
-                        response.status_code
+                        response.status_code,
                     )
 
                 data = response.json()
@@ -121,9 +121,7 @@ class GrokAdapter:
             raise APIError(str(e), self.PROVIDER_NAME)
 
     def _convert_messages(
-        self,
-        messages: list[dict[str, Any]],
-        system: str | None
+        self, messages: list[dict[str, Any]], system: str | None
     ) -> list[dict[str, Any]]:
         """Convert Anthropic-style messages to OpenAI-compatible format."""
         openai_messages = []
@@ -141,16 +139,17 @@ class GrokAdapter:
                 if isinstance(content, list):
                     for item in content:
                         if item.get("type") == "tool_result":
-                            openai_messages.append({
-                                "role": "tool",
-                                "tool_call_id": item["tool_use_id"],
-                                "content": item["content"]
-                            })
+                            openai_messages.append(
+                                {
+                                    "role": "tool",
+                                    "tool_call_id": item["tool_use_id"],
+                                    "content": item["content"],
+                                }
+                            )
                         elif item.get("type") == "text":
-                            openai_messages.append({
-                                "role": "user",
-                                "content": item["text"]
-                            })
+                            openai_messages.append(
+                                {"role": "user", "content": item["text"]}
+                            )
                 else:
                     openai_messages.append({"role": "user", "content": content})
 
@@ -164,14 +163,16 @@ class GrokAdapter:
                         if item.get("type") == "text":
                             text_parts.append(item["text"])
                         elif item.get("type") == "tool_use":
-                            tool_calls.append({
-                                "id": item["id"],
-                                "type": "function",
-                                "function": {
-                                    "name": item["name"],
-                                    "arguments": json.dumps(item["input"])
+                            tool_calls.append(
+                                {
+                                    "id": item["id"],
+                                    "type": "function",
+                                    "function": {
+                                        "name": item["name"],
+                                        "arguments": json.dumps(item["input"]),
+                                    },
                                 }
-                            })
+                            )
 
                     assistant_msg: dict[str, Any] = {"role": "assistant"}
                     if text_parts:
@@ -200,11 +201,13 @@ class GrokAdapter:
         # Add tool calls if present
         if message.get("tool_calls"):
             for tool_call in message["tool_calls"]:
-                content.append(ToolCall(
-                    id=tool_call["id"],
-                    name=tool_call["function"]["name"],
-                    input=json.loads(tool_call["function"]["arguments"])
-                ))
+                content.append(
+                    ToolCall(
+                        id=tool_call["id"],
+                        name=tool_call["function"]["name"],
+                        input=json.loads(tool_call["function"]["arguments"]),
+                    )
+                )
 
         # Map finish reason to stop reason
         finish_reason = choice.get("finish_reason", "")
@@ -223,9 +226,9 @@ class GrokAdapter:
             stop_reason=stop_reason,
             usage=Usage(
                 input_tokens=usage_data.get("prompt_tokens", 0),
-                output_tokens=usage_data.get("completion_tokens", 0)
+                output_tokens=usage_data.get("completion_tokens", 0),
             ),
             provider=self.PROVIDER_NAME,
             model=model,
-            raw_response=data
+            raw_response=data,
         )

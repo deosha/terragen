@@ -10,8 +10,7 @@ from pathlib import Path
 
 # Skip integration tests if no API key
 pytestmark = pytest.mark.skipif(
-    not os.environ.get("ANTHROPIC_API_KEY"),
-    reason="ANTHROPIC_API_KEY not set"
+    not os.environ.get("ANTHROPIC_API_KEY"), reason="ANTHROPIC_API_KEY not set"
 )
 
 
@@ -29,15 +28,20 @@ class TestGenerateIntegration:
         """Should generate valid Terraform for S3 bucket."""
         result = subprocess.run(
             [
-                "python", "-m", "terragen.main", "generate",
+                "python",
+                "-m",
+                "terragen.main",
+                "generate",
                 "S3 bucket",
-                "-o", temp_output,
-                "-p", "aws",
-                "-y"
+                "-o",
+                temp_output,
+                "-p",
+                "aws",
+                "-y",
             ],
             capture_output=True,
             text=True,
-            timeout=300
+            timeout=300,
         )
 
         # Check files were created
@@ -50,15 +54,20 @@ class TestGenerateIntegration:
         """Should use GCP region defaults."""
         result = subprocess.run(
             [
-                "python", "-m", "terragen.main", "generate",
+                "python",
+                "-m",
+                "terragen.main",
+                "generate",
                 "GCS bucket",
-                "-o", temp_output,
-                "-p", "gcp",
-                "-y"
+                "-o",
+                temp_output,
+                "-p",
+                "gcp",
+                "-y",
             ],
             capture_output=True,
             text=True,
-            timeout=300
+            timeout=300,
         )
 
         # Check provider config
@@ -79,35 +88,40 @@ class TestModifyIntegration:
             subprocess.run(["git", "init"], cwd=tmpdir, capture_output=True)
             subprocess.run(
                 ["git", "config", "user.email", "test@test.com"],
-                cwd=tmpdir, capture_output=True
+                cwd=tmpdir,
+                capture_output=True,
             )
             subprocess.run(
-                ["git", "config", "user.name", "Test"],
-                cwd=tmpdir, capture_output=True
+                ["git", "config", "user.name", "Test"], cwd=tmpdir, capture_output=True
             )
 
             # Create basic Terraform files
-            Path(os.path.join(tmpdir, "main.tf")).write_text('''
+            Path(os.path.join(tmpdir, "main.tf")).write_text(
+                """
 resource "aws_s3_bucket" "main" {
   bucket = "my-bucket"
 }
-''')
-            Path(os.path.join(tmpdir, "variables.tf")).write_text('''
+"""
+            )
+            Path(os.path.join(tmpdir, "variables.tf")).write_text(
+                """
 variable "region" {
   default = "us-east-1"
 }
-''')
-            Path(os.path.join(tmpdir, "providers.tf")).write_text('''
+"""
+            )
+            Path(os.path.join(tmpdir, "providers.tf")).write_text(
+                """
 provider "aws" {
   region = var.region
 }
-''')
+"""
+            )
 
             # Commit
             subprocess.run(["git", "add", "."], cwd=tmpdir, capture_output=True)
             subprocess.run(
-                ["git", "commit", "-m", "Initial"],
-                cwd=tmpdir, capture_output=True
+                ["git", "commit", "-m", "Initial"], cwd=tmpdir, capture_output=True
             )
 
             yield tmpdir
@@ -118,10 +132,7 @@ provider "aws" {
         # This test would need mocking to avoid actual API calls
         # Just verify the infrastructure is set up correctly
         result = subprocess.run(
-            ["git", "branch"],
-            cwd=temp_infra,
-            capture_output=True,
-            text=True
+            ["git", "branch"], cwd=temp_infra, capture_output=True, text=True
         )
 
         assert "main" in result.stdout or "master" in result.stdout
@@ -134,7 +145,8 @@ class TestValidateIntegration:
     def valid_terraform(self):
         """Create valid Terraform configuration."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            Path(os.path.join(tmpdir, "main.tf")).write_text('''
+            Path(os.path.join(tmpdir, "main.tf")).write_text(
+                """
 terraform {
   required_version = ">= 1.0"
 }
@@ -147,7 +159,8 @@ variable "name" {
 output "name" {
   value = var.name
 }
-''')
+"""
+            )
             yield tmpdir
 
     def test_validate_valid_terraform(self, valid_terraform):
@@ -156,7 +169,7 @@ output "name" {
             ["python", "-m", "terragen.main", "validate", valid_terraform],
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=60,
         )
 
         # Should pass format and validate checks
@@ -166,11 +179,13 @@ output "name" {
     def invalid_terraform(self):
         """Create invalid Terraform configuration."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            Path(os.path.join(tmpdir, "main.tf")).write_text('''
+            Path(os.path.join(tmpdir, "main.tf")).write_text(
+                """
 resource "invalid" {
   this is not valid terraform
 }
-''')
+"""
+            )
             yield tmpdir
 
     def test_validate_invalid_terraform(self, invalid_terraform):
@@ -179,7 +194,7 @@ resource "invalid" {
             ["python", "-m", "terragen.main", "validate", invalid_terraform],
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=60,
         )
 
         # Should show validation errors

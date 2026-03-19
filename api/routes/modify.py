@@ -106,23 +106,34 @@ async def commit_and_push(
     """Commit changes and push to remote."""
     # Configure git
     await asyncio.create_subprocess_exec(
-        "git", "config", "user.email", user.email or f"{user.username}@users.noreply.github.com",
+        "git",
+        "config",
+        "user.email",
+        user.email or f"{user.username}@users.noreply.github.com",
         cwd=str(target_dir),
     )
     await asyncio.create_subprocess_exec(
-        "git", "config", "user.name", user.name or user.username,
+        "git",
+        "config",
+        "user.name",
+        user.name or user.username,
         cwd=str(target_dir),
     )
 
     # Add all changes
     await asyncio.create_subprocess_exec(
-        "git", "add", "-A",
+        "git",
+        "add",
+        "-A",
         cwd=str(target_dir),
     )
 
     # Commit
     process = await asyncio.create_subprocess_exec(
-        "git", "commit", "-m", message,
+        "git",
+        "commit",
+        "-m",
+        message,
         cwd=str(target_dir),
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -131,7 +142,11 @@ async def commit_and_push(
 
     # Push
     process = await asyncio.create_subprocess_exec(
-        "git", "push", "-u", "origin", branch_name,
+        "git",
+        "push",
+        "-u",
+        "origin",
+        branch_name,
         cwd=str(target_dir),
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -243,6 +258,7 @@ async def run_modification(
 
         # Import from terragen core
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
         from terragen.modifier import (

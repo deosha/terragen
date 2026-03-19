@@ -78,6 +78,7 @@ def decrypt_token(encrypted: str) -> str:
 # GitHub
 # =============================================================================
 
+
 async def github_exchange_code(code: str) -> str:
     """Exchange GitHub OAuth code for access token."""
     settings = get_settings()
@@ -156,6 +157,7 @@ async def github_get_user(access_token: str) -> GitUser:
 # GitLab
 # =============================================================================
 
+
 async def gitlab_exchange_code(code: str) -> str:
     """Exchange GitLab OAuth code for access token."""
     settings = get_settings()
@@ -214,6 +216,7 @@ async def gitlab_get_user(access_token: str) -> GitUser:
 # =============================================================================
 # Bitbucket
 # =============================================================================
+
 
 async def bitbucket_exchange_code(code: str) -> str:
     """Exchange Bitbucket OAuth code for access token."""
@@ -284,6 +287,7 @@ async def bitbucket_get_user(access_token: str) -> GitUser:
 # =============================================================================
 # Unified Functions
 # =============================================================================
+
 
 async def exchange_code_for_token(code: str, provider: GitProvider) -> str:
     """Exchange OAuth code for access token."""

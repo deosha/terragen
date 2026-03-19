@@ -17,6 +17,7 @@ from typing import Optional
 
 class Severity(Enum):
     """Security issue severity levels."""
+
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
@@ -39,6 +40,7 @@ class Severity(Enum):
 @dataclass
 class SecurityIssue:
     """A security issue found during scanning."""
+
     rule_id: str
     severity: Severity
     title: str
@@ -183,7 +185,7 @@ class PatternScanner:
         resource_pattern = rf'resource\s+"{resource_type}"\s+"([^"]+)"'
 
         # Search backwards from match position for resource declaration
-        before_match = content[:match.start()]
+        before_match = content[: match.start()]
         resource_matches = list(re.finditer(resource_pattern, before_match))
 
         if resource_matches:
@@ -195,7 +197,9 @@ class PatternScanner:
         # If no resource found before, search from beginning
         first_match = re.search(resource_pattern, content)
         if first_match:
-            return first_match.group(1), self._find_line_number(content, first_match.start())
+            return first_match.group(1), self._find_line_number(
+                content, first_match.start()
+            )
 
         return "unknown", self._find_line_number(content, match.start())
 
@@ -250,17 +254,19 @@ class PatternScanner:
                             content, match, resource_type
                         )
 
-                    issues.append(SecurityIssue(
-                        rule_id=rule_id,
-                        severity=severity,
-                        title=title,
-                        description=description,
-                        file_path=filename,
-                        line_number=line_num,
-                        resource_type=f"{resource_type}.{resource_name}",
-                        remediation=remediation,
-                        scanner="pattern",
-                    ))
+                    issues.append(
+                        SecurityIssue(
+                            rule_id=rule_id,
+                            severity=severity,
+                            title=title,
+                            description=description,
+                            file_path=filename,
+                            line_number=line_num,
+                            resource_type=f"{resource_type}.{resource_name}",
+                            remediation=remediation,
+                            scanner="pattern",
+                        )
+                    )
 
                     # Only report once per rule per file for resource-level rules
                     if rule.get("resource_type") != "any":

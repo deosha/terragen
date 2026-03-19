@@ -15,5 +15,5 @@ This is the main entry point. The code is organized into modules:
 
 from .cli import cli, main
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

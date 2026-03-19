@@ -57,7 +57,7 @@ Generate clarifying questions that would help you create better Terraform code f
         response = client.create_message(
             max_tokens=1024,
             system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}]
+            messages=[{"role": "user", "content": user_prompt}],
         )
 
         response_text = response.get_text().strip()
@@ -72,7 +72,9 @@ Generate clarifying questions that would help you create better Terraform code f
         return questions
 
     except Exception as e:
-        console.print(f"[yellow]Warning: Could not generate LLM questions: {e}[/yellow]")
+        console.print(
+            f"[yellow]Warning: Could not generate LLM questions: {e}[/yellow]"
+        )
         # Fallback to basic questions
         return [
             {
@@ -86,7 +88,16 @@ Generate clarifying questions that would help you create better Terraform code f
 
 # Service type detection patterns
 SERVICE_PATTERNS = {
-    "database": ["database", "rds", "db", "postgres", "mysql", "sql", "aurora", "dynamodb"],
+    "database": [
+        "database",
+        "rds",
+        "db",
+        "postgres",
+        "mysql",
+        "sql",
+        "aurora",
+        "dynamodb",
+    ],
     "kubernetes": ["kubernetes", "eks", "gke", "aks", "k8s", "cluster"],
     "storage": ["s3", "bucket", "storage", "blob", "gcs"],
     "serverless": ["lambda", "function", "serverless", "api gateway"],
@@ -117,72 +128,86 @@ def get_questions_for_service(service_type: str, provider: str = "aws") -> list:
     ]
 
     if service_type == "database":
-        questions.extend([
-            {
-                "id": "db_engine",
-                "question": "Which database engine?",
-                "options": ["postgresql", "mysql", "aurora"] if provider == "aws" else ["postgresql", "mysql"],
-                "default": "postgresql",
-            },
-            {
-                "id": "db_multi_az",
-                "question": "Enable high availability (Multi-AZ)?",
-                "options": ["yes", "no"],
-                "default": "no",
-            },
-        ])
+        questions.extend(
+            [
+                {
+                    "id": "db_engine",
+                    "question": "Which database engine?",
+                    "options": (
+                        ["postgresql", "mysql", "aurora"]
+                        if provider == "aws"
+                        else ["postgresql", "mysql"]
+                    ),
+                    "default": "postgresql",
+                },
+                {
+                    "id": "db_multi_az",
+                    "question": "Enable high availability (Multi-AZ)?",
+                    "options": ["yes", "no"],
+                    "default": "no",
+                },
+            ]
+        )
 
     elif service_type == "kubernetes":
-        questions.extend([
-            {
-                "id": "k8s_node_count",
-                "question": "Number of worker nodes?",
-                "options": ["2", "3", "5", "10"],
-                "default": "3",
-            },
-            {
-                "id": "k8s_autoscaling",
-                "question": "Enable cluster autoscaling?",
-                "options": ["yes", "no"],
-                "default": "yes",
-            },
-        ])
+        questions.extend(
+            [
+                {
+                    "id": "k8s_node_count",
+                    "question": "Number of worker nodes?",
+                    "options": ["2", "3", "5", "10"],
+                    "default": "3",
+                },
+                {
+                    "id": "k8s_autoscaling",
+                    "question": "Enable cluster autoscaling?",
+                    "options": ["yes", "no"],
+                    "default": "yes",
+                },
+            ]
+        )
 
     elif service_type == "storage":
-        questions.extend([
-            {
-                "id": "storage_versioning",
-                "question": "Enable versioning?",
-                "options": ["yes", "no"],
-                "default": "yes",
-            },
-            {
-                "id": "storage_encryption",
-                "question": "Enable encryption?",
-                "options": ["yes", "no"],
-                "default": "yes",
-            },
-        ])
+        questions.extend(
+            [
+                {
+                    "id": "storage_versioning",
+                    "question": "Enable versioning?",
+                    "options": ["yes", "no"],
+                    "default": "yes",
+                },
+                {
+                    "id": "storage_encryption",
+                    "question": "Enable encryption?",
+                    "options": ["yes", "no"],
+                    "default": "yes",
+                },
+            ]
+        )
 
     elif service_type == "serverless":
-        questions.extend([
-            {
-                "id": "lambda_memory",
-                "question": "Function memory (MB)?",
-                "options": ["128", "256", "512", "1024"],
-                "default": "256",
-            },
-        ])
+        questions.extend(
+            [
+                {
+                    "id": "lambda_memory",
+                    "question": "Function memory (MB)?",
+                    "options": ["128", "256", "512", "1024"],
+                    "default": "256",
+                },
+            ]
+        )
 
     return questions
 
 
 def ask_clarifying_questions(prompt: str) -> dict:
     """Ask user clarifying questions about their infrastructure requirements."""
-    console.print(Panel.fit(
-        "[bold blue]Let me ask a few questions to generate better Terraform code[/bold blue]",
-        title="Clarification"
-    ))
+    console.print(
+        Panel.fit(
+            "[bold blue]Let me ask a few questions to generate better Terraform code[/bold blue]",
+            title="Clarification",
+        )
+    )
 
     answers = {}
     prompt_lower = prompt.lower()
@@ -222,32 +247,46 @@ def ask_clarifying_questions(prompt: str) -> dict:
     # Service-specific questions based on prompt content
     question_num = 4
 
-    if any(s in prompt_lower for s in ["database", "rds", "db", "postgres", "mysql", "sql"]):
+    if any(
+        s in prompt_lower for s in ["database", "rds", "db", "postgres", "mysql", "sql"]
+    ):
         console.print(f"\n[bold]{question_num}. Database Configuration[/bold]")
         answers["db_multi_az"] = Confirm.ask("Enable Multi-AZ/HA?", default=is_prod)
-        answers["db_engine"] = Prompt.ask("Database engine", choices=["postgresql", "mysql", "aurora"], default="postgresql")
+        answers["db_engine"] = Prompt.ask(
+            "Database engine",
+            choices=["postgresql", "mysql", "aurora"],
+            default="postgresql",
+        )
         question_num += 1
 
     if any(s in prompt_lower for s in ["kubernetes", "eks", "gke", "aks", "k8s"]):
         console.print(f"\n[bold]{question_num}. Kubernetes Configuration[/bold]")
-        answers["k8s_node_count"] = Prompt.ask("Number of nodes", default="3" if is_prod else "2")
+        answers["k8s_node_count"] = Prompt.ask(
+            "Number of nodes", default="3" if is_prod else "2"
+        )
         answers["k8s_autoscaling"] = Confirm.ask("Enable autoscaling?", default=is_prod)
         question_num += 1
 
     if any(s in prompt_lower for s in ["s3", "bucket", "storage"]):
         console.print(f"\n[bold]{question_num}. Storage Configuration[/bold]")
-        answers["storage_versioning"] = Confirm.ask("Enable versioning?", default=is_prod)
+        answers["storage_versioning"] = Confirm.ask(
+            "Enable versioning?", default=is_prod
+        )
         answers["storage_encryption"] = Confirm.ask("Enable encryption?", default=True)
         question_num += 1
 
     if any(s in prompt_lower for s in ["lambda", "function", "serverless"]):
         console.print(f"\n[bold]{question_num}. Serverless Configuration[/bold]")
-        answers["lambda_memory"] = Prompt.ask("Memory (MB)", choices=["128", "256", "512", "1024"], default="256")
+        answers["lambda_memory"] = Prompt.ask(
+            "Memory (MB)", choices=["128", "256", "512", "1024"], default="256"
+        )
         question_num += 1
 
     if is_prod:
         console.print(f"\n[bold]{question_num}. Production Settings[/bold]")
-        answers["enable_backups"] = Confirm.ask("Enable automated backups?", default=True)
+        answers["enable_backups"] = Confirm.ask(
+            "Enable automated backups?", default=True
+        )
         answers["enable_monitoring"] = Confirm.ask("Enable monitoring?", default=True)
 
     return answers
@@ -255,70 +294,46 @@ def ask_clarifying_questions(prompt: str) -> dict:
 
 def ask_backend_config(backend: str, provider: str, region: str) -> dict:
     """Ask for backend configuration parameters."""
-    console.print(Panel.fit(
-        f"[bold blue]Configure {backend.upper()} Backend[/bold blue]\n"
-        f"[dim]Press Enter to use defaults[/dim]",
-        title="State Backend"
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold blue]Configure {backend.upper()} Backend[/bold blue]\n"
+            f"[dim]Press Enter to use defaults[/dim]",
+            title="State Backend",
+        )
+    )
 
     config = {"type": backend}
 
     if backend == "s3":
         config["bucket"] = Prompt.ask(
-            "S3 bucket name",
-            default=f"terraform-state-{region}"
+            "S3 bucket name", default=f"terraform-state-{region}"
         )
-        config["key"] = Prompt.ask(
-            "State file key",
-            default="terraform.tfstate"
-        )
-        config["region"] = Prompt.ask(
-            "S3 bucket region",
-            default=region
-        )
+        config["key"] = Prompt.ask("State file key", default="terraform.tfstate")
+        config["region"] = Prompt.ask("S3 bucket region", default=region)
         config["dynamodb_table"] = Prompt.ask(
-            "DynamoDB table for locking",
-            default="terraform-locks"
+            "DynamoDB table for locking", default="terraform-locks"
         )
         config["encrypt"] = Confirm.ask("Encrypt state file?", default=True)
 
     elif backend == "gcs":
         config["bucket"] = Prompt.ask(
-            "GCS bucket name",
-            default=f"terraform-state-{region}"
+            "GCS bucket name", default=f"terraform-state-{region}"
         )
-        config["prefix"] = Prompt.ask(
-            "State file prefix",
-            default="terraform/state"
-        )
+        config["prefix"] = Prompt.ask("State file prefix", default="terraform/state")
 
     elif backend == "azurerm":
         config["resource_group_name"] = Prompt.ask(
-            "Resource group name",
-            default="terraform-state-rg"
+            "Resource group name", default="terraform-state-rg"
         )
         config["storage_account_name"] = Prompt.ask(
-            "Storage account name",
-            default="tfstate"
+            "Storage account name", default="tfstate"
         )
-        config["container_name"] = Prompt.ask(
-            "Container name",
-            default="tfstate"
-        )
-        config["key"] = Prompt.ask(
-            "State file key",
-            default="terraform.tfstate"
-        )
+        config["container_name"] = Prompt.ask("Container name", default="tfstate")
+        config["key"] = Prompt.ask("State file key", default="terraform.tfstate")
 
     elif backend == "remote":  # Terraform Cloud
-        config["organization"] = Prompt.ask(
-            "Terraform Cloud organization",
-            default=""
-        )
-        config["workspace"] = Prompt.ask(
-            "Workspace name",
-            default="default"
-        )
+        config["organization"] = Prompt.ask("Terraform Cloud organization", default="")
+        config["workspace"] = Prompt.ask("Workspace name", default="default")
 
     return config
 
@@ -337,8 +352,7 @@ def build_backend_context(backend_config: dict) -> str:
 
     # Check if specific config values were provided
     has_specific_config = any(
-        k != "type" and v is not None
-        for k, v in backend_config.items()
+        k != "type" and v is not None for k, v in backend_config.items()
     )
 
     if has_specific_config:
@@ -352,18 +366,35 @@ def build_backend_context(backend_config: dict) -> str:
 def _build_active_backend(backend_config: dict) -> str:
     """Build active backend configuration with user-provided values."""
     backend_type = backend_config.get("type", "")
-    context = [f"\n## State Backend Configuration\nGenerate an ACTIVE (uncommented) {backend_type} backend block with these values:"]
+    context = [
+        f"\n## State Backend Configuration\nGenerate an ACTIVE (uncommented) {backend_type} backend block with these values:"
+    ]
 
     if backend_type == "s3":
         # Build S3 backend block
-        s3_lines = ['    bucket         = "{}"'.format(backend_config.get('bucket', 'MISSING-BUCKET-NAME'))]
-        s3_lines.append('    key            = "{}"'.format(backend_config.get('key', 'terraform.tfstate')))
-        s3_lines.append('    region         = "{}"'.format(backend_config.get('region', 'us-east-1')))
-        s3_lines.append('    encrypt        = true')
-        if backend_config.get('dynamodb_table'):
-            s3_lines.append('    dynamodb_table = "{}"'.format(backend_config['dynamodb_table']))
+        s3_lines = [
+            '    bucket         = "{}"'.format(
+                backend_config.get("bucket", "MISSING-BUCKET-NAME")
+            )
+        ]
+        s3_lines.append(
+            '    key            = "{}"'.format(
+                backend_config.get("key", "terraform.tfstate")
+            )
+        )
+        s3_lines.append(
+            '    region         = "{}"'.format(
+                backend_config.get("region", "us-east-1")
+            )
+        )
+        s3_lines.append("    encrypt        = true")
+        if backend_config.get("dynamodb_table"):
+            s3_lines.append(
+                '    dynamodb_table = "{}"'.format(backend_config["dynamodb_table"])
+            )
 
-        context.append(f"""
+        context.append(
+            f"""
 ```hcl
 terraform {{
   backend "s3" {{
@@ -376,10 +407,12 @@ IMPORTANT:
 - Generate this EXACT backend block (uncommented) in backend.tf
 - The S3 bucket "{backend_config.get('bucket', 'MISSING')}" MUST exist before running terraform init
 {"- The DynamoDB table for locking MUST exist" if backend_config.get('dynamodb_table') else ""}
-- If initialization fails with "bucket not found", the user needs to create the bucket first""")
+- If initialization fails with "bucket not found", the user needs to create the bucket first"""
+        )
 
     elif backend_type == "gcs":
-        context.append(f"""
+        context.append(
+            f"""
 ```hcl
 terraform {{
   backend "gcs" {{
@@ -391,10 +424,12 @@ terraform {{
 
 IMPORTANT:
 - Generate this EXACT backend block (uncommented) in backend.tf
-- The GCS bucket "{backend_config.get('bucket', 'MISSING')}" MUST exist before running terraform init""")
+- The GCS bucket "{backend_config.get('bucket', 'MISSING')}" MUST exist before running terraform init"""
+        )
 
     elif backend_type == "azurerm":
-        context.append(f"""
+        context.append(
+            f"""
 ```hcl
 terraform {{
   backend "azurerm" {{
@@ -408,10 +443,12 @@ terraform {{
 
 IMPORTANT:
 - Generate this EXACT backend block (uncommented) in backend.tf
-- The Azure storage account and container MUST exist before running terraform init""")
+- The Azure storage account and container MUST exist before running terraform init"""
+        )
 
     elif backend_type == "remote":
-        context.append(f"""
+        context.append(
+            f"""
 ```hcl
 terraform {{
   cloud {{
@@ -425,7 +462,8 @@ terraform {{
 
 IMPORTANT:
 - Generate this EXACT backend block (uncommented) in backend.tf
-- The Terraform Cloud organization and workspace MUST exist before running terraform init""")
+- The Terraform Cloud organization and workspace MUST exist before running terraform init"""
+        )
 
     return "\n".join(context)
 
@@ -435,17 +473,20 @@ def _build_commented_backend(backend_type: str) -> str:
 
     The user must fill in the TODO values and uncomment before using.
     """
-    context = [f"""
+    context = [
+        f"""
 ## State Backend Configuration
 The user selected {backend_type.upper()} backend. Generate backend.tf with:
 1. ONLY the {backend_type} backend block (not other backends)
 2. The backend block should be COMMENTED OUT with TODO placeholders
 3. Clear instructions for the user to fill in values
 
-Example for backend.tf:"""]
+Example for backend.tf:"""
+    ]
 
     if backend_type == "s3":
-        context.append("""
+        context.append(
+            """
 ```hcl
 # S3 Backend Configuration
 # ========================
@@ -463,9 +504,11 @@ Example for backend.tf:"""]
 #     dynamodb_table = "TODO-your-lock-table"           # DynamoDB table for locking
 #   }
 # }
-```""")
+```"""
+        )
     elif backend_type == "gcs":
-        context.append("""
+        context.append(
+            """
 ```hcl
 # GCS Backend Configuration
 # =========================
@@ -479,9 +522,11 @@ Example for backend.tf:"""]
 #     prefix = "terraform/state"                # State file prefix
 #   }
 # }
-```""")
+```"""
+        )
     elif backend_type == "azurerm":
-        context.append("""
+        context.append(
+            """
 ```hcl
 # Azure Storage Backend Configuration
 # ====================================
@@ -497,9 +542,11 @@ Example for backend.tf:"""]
 #     key                  = "terraform.tfstate"         # State file name
 #   }
 # }
-```""")
+```"""
+        )
     elif backend_type in ("remote", "terraform_cloud"):
-        context.append("""
+        context.append(
+            """
 ```hcl
 # Terraform Cloud Backend Configuration
 # ======================================
@@ -516,11 +563,14 @@ Example for backend.tf:"""]
 #     }
 #   }
 # }
-```""")
+```"""
+        )
 
-    context.append("""
+    context.append(
+        """
 IMPORTANT: Generate ONLY this backend type in backend.tf, NOT other backend examples.
-The backend block MUST be commented out with TODO placeholders as shown above.""")
+The backend block MUST be commented out with TODO placeholders as shown above."""
+    )
 
     return "\n".join(context)
 
@@ -580,8 +630,12 @@ def build_clarification_context(clarifications: dict) -> str:
     if clarifications.get("disaster-recovery"):
         context.append("- Disaster Recovery: Enabled (cross-region replication)")
     if clarifications.get("cost-optimization"):
-        context.append("- Cost Optimization: Apply reserved capacity, spot instances where appropriate")
+        context.append(
+            "- Cost Optimization: Apply reserved capacity, spot instances where appropriate"
+        )
     if clarifications.get("compliance"):
-        context.append("- Compliance: Enable audit logging, encryption, access controls")
+        context.append(
+            "- Compliance: Enable audit logging, encryption, access controls"
+        )
 
     return "\n".join(context)

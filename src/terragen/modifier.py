@@ -53,7 +53,7 @@ def read_state_file(infra_dir: Path) -> Optional[dict]:
             cwd=infra_dir,
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
         )
         if result.returncode == 0 and result.stdout.strip():
             state = json.loads(result.stdout)
@@ -78,7 +78,7 @@ def get_git_info(infra_dir: Path) -> dict:
         "branch": None,
         "last_commit": None,
         "uncommitted_changes": False,
-        "recent_commits": []
+        "recent_commits": [],
     }
 
     try:
@@ -87,7 +87,7 @@ def get_git_info(infra_dir: Path) -> dict:
             ["git", "rev-parse", "--git-dir"],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode != 0:
             return git_info
@@ -99,7 +99,7 @@ def get_git_info(infra_dir: Path) -> dict:
             ["git", "branch", "--show-current"],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             git_info["branch"] = result.stdout.strip()
@@ -109,7 +109,7 @@ def get_git_info(infra_dir: Path) -> dict:
             ["git", "log", "-1", "--format=%h %s (%cr)"],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             git_info["last_commit"] = result.stdout.strip()
@@ -119,7 +119,7 @@ def get_git_info(infra_dir: Path) -> dict:
             ["git", "status", "--porcelain"],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             git_info["uncommitted_changes"] = bool(result.stdout.strip())
@@ -129,7 +129,7 @@ def get_git_info(infra_dir: Path) -> dict:
             ["git", "log", "-5", "--format=%h %s"],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             git_info["recent_commits"] = result.stdout.strip().split("\n")
@@ -183,7 +183,7 @@ def create_branch(infra_dir: Path, branch_name: str) -> bool:
             ["git", "checkout", "-b", branch_name],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             console.print(f"[green]✓[/green] Created branch: {branch_name}")
@@ -201,10 +201,7 @@ def commit_changes(infra_dir: Path, message: str) -> bool:
     try:
         # Stage all changes
         result = subprocess.run(
-            ["git", "add", "-A"],
-            cwd=infra_dir,
-            capture_output=True,
-            text=True
+            ["git", "add", "-A"], cwd=infra_dir, capture_output=True, text=True
         )
         if result.returncode != 0:
             console.print(f"[red]✗[/red] Failed to stage changes: {result.stderr}")
@@ -215,7 +212,7 @@ def commit_changes(infra_dir: Path, message: str) -> bool:
             ["git", "commit", "-m", message],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             console.print(f"[green]✓[/green] Committed: {message}")
@@ -235,7 +232,7 @@ def push_branch(infra_dir: Path, branch_name: str) -> bool:
             ["git", "push", "-u", "origin", branch_name],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             console.print(f"[green]✓[/green] Pushed branch to origin")
@@ -255,7 +252,7 @@ def create_pull_request(infra_dir: Path, title: str, body: str) -> Optional[str]
             ["gh", "pr", "create", "--title", title, "--body", body],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             pr_url = result.stdout.strip()
@@ -265,7 +262,9 @@ def create_pull_request(infra_dir: Path, title: str, body: str) -> Optional[str]
             console.print(f"[red]✗[/red] Failed to create PR: {result.stderr}")
             return None
     except FileNotFoundError:
-        console.print("[yellow]Warning: GitHub CLI (gh) not found. Install with: brew install gh[/yellow]")
+        console.print(
+            "[yellow]Warning: GitHub CLI (gh) not found. Install with: brew install gh[/yellow]"
+        )
         return None
     except Exception as e:
         console.print(f"[red]✗[/red] Error creating PR: {e}")
@@ -273,16 +272,16 @@ def create_pull_request(infra_dir: Path, title: str, body: str) -> Optional[str]
 
 
 def modify_infrastructure(
-    prompt: str,
-    infra_dir: Path,
-    chat_mode: bool = False
+    prompt: str, infra_dir: Path, chat_mode: bool = False
 ) -> None:
     """Modify existing Terraform infrastructure."""
 
-    console.print(Panel.fit(
-        "[bold blue]TerraGen - Modify Existing Infrastructure[/bold blue]",
-        title="Modify Mode"
-    ))
+    console.print(
+        Panel.fit(
+            "[bold blue]TerraGen - Modify Existing Infrastructure[/bold blue]",
+            title="Modify Mode",
+        )
+    )
 
     # Read existing infrastructure
     console.print("\n[yellow]Reading infrastructure...[/yellow]")
@@ -304,22 +303,30 @@ def modify_infrastructure(
     is_git_repo = git_info["is_repo"]
 
     if is_git_repo:
-        console.print(f"[green]✓[/green] Git repo detected (branch: {git_info['branch']}, last commit: {git_info['last_commit']})")
+        console.print(
+            f"[green]✓[/green] Git repo detected (branch: {git_info['branch']}, last commit: {git_info['last_commit']})"
+        )
         if git_info["uncommitted_changes"]:
-            console.print("[red]Error: You have uncommitted changes. Please commit or stash them first.[/red]")
+            console.print(
+                "[red]Error: You have uncommitted changes. Please commit or stash them first.[/red]"
+            )
             return
     else:
-        console.print("[yellow]![/yellow] Not a git repository - changes will be made directly")
+        console.print(
+            "[yellow]![/yellow] Not a git repository - changes will be made directly"
+        )
 
     # Show analysis
-    console.print(Panel.fit(
-        f"[bold]Infrastructure Analysis[/bold]\n\n"
-        f"[green]Terraform files:[/green] {len(tf_files)}\n"
-        f"[green]Resources deployed:[/green] {len(state.get('resources', [])) if state else 'Unknown'}\n"
-        f"[green]Git repo:[/green] {'Yes' if is_git_repo else 'No'}\n"
-        f"[green]Git branch:[/green] {git_info['branch'] or 'N/A'}",
-        title="Current State"
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold]Infrastructure Analysis[/bold]\n\n"
+            f"[green]Terraform files:[/green] {len(tf_files)}\n"
+            f"[green]Resources deployed:[/green] {len(state.get('resources', [])) if state else 'Unknown'}\n"
+            f"[green]Git repo:[/green] {'Yes' if is_git_repo else 'No'}\n"
+            f"[green]Git branch:[/green] {git_info['branch'] or 'N/A'}",
+            title="Current State",
+        )
+    )
 
     branch_name = None
 
@@ -327,14 +334,18 @@ def modify_infrastructure(
     if is_git_repo:
         console.print("\n[yellow]Step 1: Creating branch...[/yellow]")
         branch_name = "terragen/" + "-".join(prompt.lower().split()[:4])
-        branch_name = "".join(c if c.isalnum() or c == "-" or c == "/" else "-" for c in branch_name)
+        branch_name = "".join(
+            c if c.isalnum() or c == "-" or c == "/" else "-" for c in branch_name
+        )
 
         if not create_branch(infra_dir, branch_name):
             console.print("[red]Failed to create branch. Aborting.[/red]")
             return
     else:
         # For local projects: ask for confirmation
-        if not Confirm.ask("\n[yellow]Proceed with modifications?[/yellow]", default=True):
+        if not Confirm.ask(
+            "\n[yellow]Proceed with modifications?[/yellow]", default=True
+        ):
             console.print("[yellow]Cancelled.[/yellow]")
             return
 
@@ -349,7 +360,7 @@ def modify_infrastructure(
     state_context = f"\n## Current Infrastructure State\n{state_summary}\n"
 
     # Build the modification prompt
-    full_prompt = f'''## Modification Request
+    full_prompt = f"""## Modification Request
 {prompt}
 
 ## Working Directory
@@ -373,7 +384,7 @@ def modify_infrastructure(
 9. Summarize what was changed/added
 
 IMPORTANT: Use absolute paths like {infra_dir}/main.tf when modifying files.
-'''
+"""
 
     # Generate modifications
     step_num = 2 if is_git_repo else 1
@@ -391,13 +402,17 @@ IMPORTANT: Use absolute paths like {infra_dir}/main.tf when modifying files.
             ["git", "status", "--porcelain"],
             cwd=infra_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
         if not result.stdout.strip():
-            console.print("[yellow]No changes were made to the infrastructure.[/yellow]")
+            console.print(
+                "[yellow]No changes were made to the infrastructure.[/yellow]"
+            )
             # Switch back to original branch
             subprocess.run(["git", "checkout", "-"], cwd=infra_dir, capture_output=True)
-            subprocess.run(["git", "branch", "-D", branch_name], cwd=infra_dir, capture_output=True)
+            subprocess.run(
+                ["git", "branch", "-D", branch_name], cwd=infra_dir, capture_output=True
+            )
             return
 
         # Show modified files
@@ -417,7 +432,7 @@ IMPORTANT: Use absolute paths like {infra_dir}/main.tf when modifying files.
             cwd=infra_dir,
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=60,
         )
 
         # Run plan
@@ -426,30 +441,34 @@ IMPORTANT: Use absolute paths like {infra_dir}/main.tf when modifying files.
             cwd=infra_dir,
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=120,
         )
 
         if result.returncode == 0:
             plan_output = result.stdout
-            lines = plan_output.split('\n')
+            lines = plan_output.split("\n")
             changes = []
             summary_line = ""
 
             for line in lines:
-                if line.strip().startswith('# ') and ('will be' in line or 'must be' in line):
+                if line.strip().startswith("# ") and (
+                    "will be" in line or "must be" in line
+                ):
                     changes.append(line)
-                elif line.strip().startswith('Plan:'):
+                elif line.strip().startswith("Plan:"):
                     summary_line = line.strip()
                     plan_summary = summary_line
 
             if changes:
-                console.print(Panel.fit(
-                    "[bold]Planned Infrastructure Changes[/bold]\n\n" +
-                    "\n".join(changes[:20]) +
-                    ("\n..." if len(changes) > 20 else "") +
-                    (f"\n\n[bold]{summary_line}[/bold]" if summary_line else ""),
-                    title="Terraform Plan"
-                ))
+                console.print(
+                    Panel.fit(
+                        "[bold]Planned Infrastructure Changes[/bold]\n\n"
+                        + "\n".join(changes[:20])
+                        + ("\n..." if len(changes) > 20 else "")
+                        + (f"\n\n[bold]{summary_line}[/bold]" if summary_line else ""),
+                        title="Terraform Plan",
+                    )
+                )
             elif "No changes" in plan_output:
                 console.print("[green]No infrastructure changes detected.[/green]")
                 plan_summary = "No changes"
@@ -493,32 +512,38 @@ IMPORTANT: Use absolute paths like {infra_dir}/main.tf when modifying files.
             pr_url = create_pull_request(infra_dir, f"TerraGen: {prompt[:50]}", pr_body)
 
             if pr_url:
-                console.print(Panel.fit(
-                    f"[bold green]Pull Request Created![/bold green]\n\n"
-                    f"[green]PR URL:[/green] {pr_url}\n"
-                    f"[green]Branch:[/green] {branch_name}\n\n"
-                    f"[yellow]Next steps:[/yellow]\n"
-                    f"  1. Review the PR\n"
-                    f"  2. Run terraform plan in CI\n"
-                    f"  3. Get approval and merge",
-                    title="Success"
-                ))
+                console.print(
+                    Panel.fit(
+                        f"[bold green]Pull Request Created![/bold green]\n\n"
+                        f"[green]PR URL:[/green] {pr_url}\n"
+                        f"[green]Branch:[/green] {branch_name}\n\n"
+                        f"[yellow]Next steps:[/yellow]\n"
+                        f"  1. Review the PR\n"
+                        f"  2. Run terraform plan in CI\n"
+                        f"  3. Get approval and merge",
+                        title="Success",
+                    )
+                )
             else:
-                console.print(Panel.fit(
-                    f"[bold yellow]Changes pushed to branch[/bold yellow]\n\n"
-                    f"[green]Branch:[/green] {branch_name}\n\n"
-                    f"[yellow]Create PR manually or install GitHub CLI:[/yellow]\n"
-                    f"  brew install gh && gh auth login",
-                    title="Done"
-                ))
+                console.print(
+                    Panel.fit(
+                        f"[bold yellow]Changes pushed to branch[/bold yellow]\n\n"
+                        f"[green]Branch:[/green] {branch_name}\n\n"
+                        f"[yellow]Create PR manually or install GitHub CLI:[/yellow]\n"
+                        f"  brew install gh && gh auth login",
+                        title="Done",
+                    )
+                )
     else:
         # For local projects: show success
-        console.print(Panel.fit(
-            f"[bold green]Modification Complete![/bold green]\n\n"
-            f"[green]Modified directory:[/green] {infra_dir}\n\n"
-            f"[yellow]Next steps:[/yellow]\n"
-            f"  cd {infra_dir}\n"
-            f"  terraform plan  # Review changes\n"
-            f"  terraform apply",
-            title="Success"
-        ))
+        console.print(
+            Panel.fit(
+                f"[bold green]Modification Complete![/bold green]\n\n"
+                f"[green]Modified directory:[/green] {infra_dir}\n\n"
+                f"[yellow]Next steps:[/yellow]\n"
+                f"  cd {infra_dir}\n"
+                f"  terraform plan  # Review changes\n"
+                f"  terraform apply",
+                title="Success",
+            )
+        )

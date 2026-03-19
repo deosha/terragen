@@ -103,27 +103,24 @@ class TestRunCommand:
     def test_run_command_with_cwd(self):
         """run_command should respect working directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = execute_tool("run_command", {
-                "command": "pwd",
-                "cwd": tmpdir
-            })
+            result = execute_tool("run_command", {"command": "pwd", "cwd": tmpdir})
 
             assert tmpdir in result
 
     def test_run_command_captures_stderr(self):
         """run_command should capture stderr."""
-        result = execute_tool("run_command", {
-            "command": "ls /nonexistent 2>&1 || true"
-        })
+        result = execute_tool(
+            "run_command", {"command": "ls /nonexistent 2>&1 || true"}
+        )
 
         # Should contain something (either error or empty)
         assert result is not None
 
     def test_run_command_invalid_command(self):
         """run_command should handle invalid commands."""
-        result = execute_tool("run_command", {
-            "command": "nonexistent_command_xyz 2>&1 || echo 'failed'"
-        })
+        result = execute_tool(
+            "run_command", {"command": "nonexistent_command_xyz 2>&1 || echo 'failed'"}
+        )
 
         assert result is not None
 
@@ -137,10 +134,7 @@ class TestListFiles:
             Path(os.path.join(tmpdir, "test1.txt")).touch()
             Path(os.path.join(tmpdir, "test2.txt")).touch()
 
-            result = execute_tool("list_files", {
-                "path": tmpdir,
-                "pattern": "*.txt"
-            })
+            result = execute_tool("list_files", {"path": tmpdir, "pattern": "*.txt"})
 
             assert "test1.txt" in result
             assert "test2.txt" in result
@@ -148,18 +142,13 @@ class TestListFiles:
     def test_list_files_empty_directory(self):
         """list_files should handle empty directories."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = execute_tool("list_files", {
-                "path": tmpdir,
-                "pattern": "*.tf"
-            })
+            result = execute_tool("list_files", {"path": tmpdir, "pattern": "*.tf"})
 
             assert "no files found" in result.lower()
 
     def test_list_files_nonexistent_directory(self):
         """list_files should return error for missing directory."""
-        result = execute_tool("list_files", {
-            "path": "/nonexistent/directory"
-        })
+        result = execute_tool("list_files", {"path": "/nonexistent/directory"})
 
         assert "Error" in result
 

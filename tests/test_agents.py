@@ -142,7 +142,9 @@ class TestPipelineContext:
 
         blocking = context.get_blocking_issues()
         assert len(blocking) == 2
-        assert all(i.severity in [IssueSeverity.CRITICAL, IssueSeverity.HIGH] for i in blocking)
+        assert all(
+            i.severity in [IssueSeverity.CRITICAL, IssueSeverity.HIGH] for i in blocking
+        )
 
     def test_get_warning_issues(self):
         """get_warning_issues should return non-blocking issues."""
@@ -483,6 +485,7 @@ class TestOrchestratorIntegration:
 
         # Just test that it's importable and has correct signature
         import inspect
+
         sig = inspect.signature(run_pipeline)
         params = list(sig.parameters.keys())
 

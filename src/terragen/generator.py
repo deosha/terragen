@@ -21,14 +21,14 @@ console = Console()
 def has_aws_credentials() -> bool:
     """Check if AWS credentials are available."""
     # Check environment variables
-    if os.environ.get('AWS_ACCESS_KEY_ID') and os.environ.get('AWS_SECRET_ACCESS_KEY'):
+    if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
         return True
     # Check AWS credentials file
-    aws_creds = Path.home() / '.aws' / 'credentials'
+    aws_creds = Path.home() / ".aws" / "credentials"
     if aws_creds.exists():
         return True
     # Check AWS config (for SSO/profiles)
-    aws_config = Path.home() / '.aws' / 'config'
+    aws_config = Path.home() / ".aws" / "config"
     if aws_config.exists():
         return True
     return False
@@ -45,7 +45,7 @@ def generate_terraform(
     clarifications: Optional[dict] = None,
     learn_from: Optional[Path] = None,
     chat_mode: bool = False,
-    backend_config: Optional[dict] = None
+    backend_config: Optional[dict] = None,
 ) -> None:
     """Generate Terraform code using Anthropic API (legacy single-agent mode)."""
 
@@ -55,17 +55,21 @@ def generate_terraform(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     mode_text = "[bold magenta]Chat Mode[/bold magenta] - " if chat_mode else ""
-    console.print(Panel.fit(
-        f"{mode_text}[bold blue]TerraGen - AI Terraform Generator[/bold blue]\n\n"
-        f"[green]Prompt:[/green] {prompt}\n"
-        f"[green]Provider:[/green] {provider}\n"
-        f"[green]Region:[/green] {region}\n"
-        f"[green]Output:[/green] {output_dir}",
-        title="Configuration"
-    ))
+    console.print(
+        Panel.fit(
+            f"{mode_text}[bold blue]TerraGen - AI Terraform Generator[/bold blue]\n\n"
+            f"[green]Prompt:[/green] {prompt}\n"
+            f"[green]Provider:[/green] {provider}\n"
+            f"[green]Region:[/green] {region}\n"
+            f"[green]Output:[/green] {output_dir}",
+            title="Configuration",
+        )
+    )
 
     # Build context
-    clarification_context = build_clarification_context(clarifications) if clarifications else ""
+    clarification_context = (
+        build_clarification_context(clarifications) if clarifications else ""
+    )
     learned_patterns = learn_patterns_from_repo(learn_from) if learn_from else ""
     backend_context = build_backend_context(backend_config) if backend_config else ""
 
@@ -76,7 +80,7 @@ def generate_terraform(
     else:
         plan_instruction = "\n   - Skip terraform plan (no AWS credentials)"
 
-    full_prompt = f'''## User Request
+    full_prompt = f"""## User Request
 {prompt}
 
 ## Configuration
@@ -106,7 +110,7 @@ def generate_terraform(
    - Report: "✓ Requirement X implemented in resource Y"
 
 Use absolute paths like {output_dir}/main.tf when creating files.
-Start by creating {output_dir}/providers.tf and {output_dir}/versions.tf first.'''
+Start by creating {output_dir}/providers.tf and {output_dir}/versions.tf first."""
 
     console.print("\n[yellow]Generating Terraform code...[/yellow]\n")
 
@@ -117,16 +121,18 @@ Start by creating {output_dir}/providers.tf and {output_dir}/versions.tf first.'
         # Single-shot mode
         result = run_agent(full_prompt, output_dir)
 
-    console.print(Panel.fit(
-        f"[bold green]Generation Complete![/bold green]\n\n"
-        f"[green]Files created in:[/green] {output_dir}\n\n"
-        f"[yellow]Next steps:[/yellow]\n"
-        f"  cd {output_dir}\n"
-        f"  terraform init\n"
-        f"  terraform plan\n"
-        f"  terraform apply",
-        title="Success"
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold green]Generation Complete![/bold green]\n\n"
+            f"[green]Files created in:[/green] {output_dir}\n\n"
+            f"[yellow]Next steps:[/yellow]\n"
+            f"  cd {output_dir}\n"
+            f"  terraform init\n"
+            f"  terraform plan\n"
+            f"  terraform apply",
+            title="Success",
+        )
+    )
 
 
 async def generate_terraform_pipeline(

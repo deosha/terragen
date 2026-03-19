@@ -51,25 +51,31 @@ async def get_providers():
     providers = []
 
     if settings.github_client_id:
-        providers.append({
-            "id": "github",
-            "name": "GitHub",
-            "icon": "github",
-        })
+        providers.append(
+            {
+                "id": "github",
+                "name": "GitHub",
+                "icon": "github",
+            }
+        )
 
     if settings.gitlab_client_id:
-        providers.append({
-            "id": "gitlab",
-            "name": "GitLab",
-            "icon": "gitlab",
-        })
+        providers.append(
+            {
+                "id": "gitlab",
+                "name": "GitLab",
+                "icon": "gitlab",
+            }
+        )
 
     if settings.bitbucket_client_id:
-        providers.append({
-            "id": "bitbucket",
-            "name": "Bitbucket",
-            "icon": "bitbucket",
-        })
+        providers.append(
+            {
+                "id": "bitbucket",
+                "name": "Bitbucket",
+                "icon": "bitbucket",
+            }
+        )
 
     return ProvidersResponse(providers=providers)
 

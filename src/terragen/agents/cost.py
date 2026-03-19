@@ -29,7 +29,9 @@ class CostEstimationAgent(BaseAgent):
     description = "Estimates infrastructure costs using Infracost"
     is_gate = False  # Cost estimation doesn't block pipeline
 
-    def __init__(self, console: Optional[Console] = None, log_callback: Optional[Any] = None):
+    def __init__(
+        self, console: Optional[Console] = None, log_callback: Optional[Any] = None
+    ):
         """Initialize the cost estimation agent."""
         super().__init__(console, log_callback)
         self.timeout = 120  # seconds
@@ -64,6 +66,7 @@ class CostEstimationAgent(BaseAgent):
 
         # Check if INFRACOST_API_KEY is set
         import os
+
         if not os.environ.get("INFRACOST_API_KEY"):
             self._log_warning("INFRACOST_API_KEY not set, skipping cost estimation")
             self._status = AgentStatus.SKIPPED
@@ -136,9 +139,12 @@ class CostEstimationAgent(BaseAgent):
                 None,
                 lambda: subprocess.run(
                     [
-                        "infracost", "breakdown",
-                        "--path", str(output_dir),
-                        "--format", "json",
+                        "infracost",
+                        "breakdown",
+                        "--path",
+                        str(output_dir),
+                        "--format",
+                        "json",
                     ],
                     capture_output=True,
                     text=True,
@@ -149,7 +155,9 @@ class CostEstimationAgent(BaseAgent):
             if result.stdout:
                 try:
                     data = json.loads(result.stdout)
-                    costs, total_monthly, total_yearly = self._parse_infracost_output(data)
+                    costs, total_monthly, total_yearly = self._parse_infracost_output(
+                        data
+                    )
                 except json.JSONDecodeError:
                     self._log_warning("Failed to parse infracost JSON output")
                     if result.stderr:
@@ -273,7 +281,7 @@ class CostEstimationAgent(BaseAgent):
             # Clean up provider prefix
             for prefix in ["aws_", "azurerm_", "google_"]:
                 if resource_type.startswith(prefix):
-                    resource_type = resource_type[len(prefix):]
+                    resource_type = resource_type[len(prefix) :]
                     break
             return resource_type.replace("_", " ").title()
 

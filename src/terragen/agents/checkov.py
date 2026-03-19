@@ -30,7 +30,9 @@ class CheckovAgent(BaseAgent):
     description = "Runs Checkov policy scans on Terraform code"
     is_gate = True  # Policy issues can block pipeline
 
-    def __init__(self, console: Optional[Console] = None, log_callback: Optional[Any] = None):
+    def __init__(
+        self, console: Optional[Console] = None, log_callback: Optional[Any] = None
+    ):
         """Initialize the Checkov agent."""
         super().__init__(console, log_callback)
         self.timeout = 180  # seconds (Checkov can be slow)
@@ -92,7 +94,9 @@ class CheckovAgent(BaseAgent):
             )
 
         if warning_issues:
-            self._log_warning(f"Found {len(warning_issues)} policy warning(s) (non-blocking)")
+            self._log_warning(
+                f"Found {len(warning_issues)} policy warning(s) (non-blocking)"
+            )
 
         self._log_success("Checkov scan passed (no blocking issues)")
         self._status = AgentStatus.SUCCESS
@@ -140,9 +144,12 @@ class CheckovAgent(BaseAgent):
                 lambda: subprocess.run(
                     [
                         "checkov",
-                        "-d", str(output_dir),
-                        "--framework", "terraform",
-                        "--output", "json",
+                        "-d",
+                        str(output_dir),
+                        "--framework",
+                        "terraform",
+                        "--output",
+                        "json",
                         "--soft-fail",  # Don't return non-zero exit code
                         "--quiet",  # Reduce output
                     ],
@@ -249,7 +256,7 @@ class CheckovAgent(BaseAgent):
             "CKV_AWS_25",  # Security group RDP from internet
             "CKV_AWS_40",  # IAM password policy
             "CKV_AWS_49",  # IAM policy attached to user
-            "CKV_AWS_1",   # IAM password policy strength
+            "CKV_AWS_1",  # IAM password policy strength
         ]
 
         # Medium severity - logging, tagging

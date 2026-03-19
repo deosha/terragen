@@ -33,10 +33,10 @@ class TestToolConverter:
                     "type": "object",
                     "properties": {
                         "path": {"type": "string"},
-                        "content": {"type": "string"}
+                        "content": {"type": "string"},
                     },
-                    "required": ["path", "content"]
-                }
+                    "required": ["path", "content"],
+                },
             }
         ]
 
@@ -46,7 +46,10 @@ class TestToolConverter:
         assert openai_tools[0]["type"] == "function"
         assert openai_tools[0]["function"]["name"] == "write_file"
         assert openai_tools[0]["function"]["description"] == "Write content to a file"
-        assert openai_tools[0]["function"]["parameters"] == anthropic_tools[0]["input_schema"]
+        assert (
+            openai_tools[0]["function"]["parameters"]
+            == anthropic_tools[0]["input_schema"]
+        )
 
     def test_anthropic_to_openai_empty(self):
         """Empty tools list returns empty list."""
@@ -56,8 +59,16 @@ class TestToolConverter:
     def test_anthropic_to_openai_multiple_tools(self):
         """Convert multiple Anthropic tools."""
         anthropic_tools = [
-            {"name": "tool1", "description": "desc1", "input_schema": {"type": "object"}},
-            {"name": "tool2", "description": "desc2", "input_schema": {"type": "object"}},
+            {
+                "name": "tool1",
+                "description": "desc1",
+                "input_schema": {"type": "object"},
+            },
+            {
+                "name": "tool2",
+                "description": "desc2",
+                "input_schema": {"type": "object"},
+            },
         ]
 
         openai_tools = anthropic_to_openai(anthropic_tools)
@@ -77,9 +88,9 @@ class TestToolConverter:
                     "parameters": {
                         "type": "object",
                         "properties": {"path": {"type": "string"}},
-                        "required": ["path"]
-                    }
-                }
+                        "required": ["path"],
+                    },
+                },
             }
         ]
 
@@ -88,7 +99,10 @@ class TestToolConverter:
         assert len(anthropic_tools) == 1
         assert anthropic_tools[0]["name"] == "read_file"
         assert anthropic_tools[0]["description"] == "Read a file"
-        assert anthropic_tools[0]["input_schema"] == openai_tools[0]["function"]["parameters"]
+        assert (
+            anthropic_tools[0]["input_schema"]
+            == openai_tools[0]["function"]["parameters"]
+        )
 
     def test_openai_to_anthropic_empty(self):
         """Empty tools list returns empty list."""
@@ -206,8 +220,11 @@ class TestUnifiedLLMClient:
     @patch("terragen.llm.anthropic_adapter.AnthropicAdapter.is_available")
     @patch("terragen.llm.anthropic_adapter.AnthropicAdapter.create_message")
     def test_fallback_on_rate_limit(
-        self, mock_anthropic_create, mock_anthropic_available,
-        mock_grok_create, mock_grok_available
+        self,
+        mock_anthropic_create,
+        mock_anthropic_available,
+        mock_grok_create,
+        mock_grok_available,
     ):
         """Client falls back to next provider on rate limit error."""
         mock_anthropic_available.return_value = True
@@ -259,9 +276,12 @@ class TestUnifiedLLMClient:
     @patch("terragen.llm.anthropic_adapter.AnthropicAdapter.create_message")
     def test_all_providers_fail(
         self,
-        mock_anthropic_create, mock_anthropic_available,
-        mock_grok_create, mock_grok_available,
-        mock_openai_create, mock_openai_available,
+        mock_anthropic_create,
+        mock_anthropic_available,
+        mock_grok_create,
+        mock_grok_available,
+        mock_openai_create,
+        mock_openai_available,
     ):
         """NoAvailableProviderError when all providers fail."""
         mock_anthropic_available.return_value = True
@@ -377,9 +397,16 @@ class TestOpenAIAdapter:
 
         adapter = OpenAIAdapter(api_key="test-key")
         messages = [
-            {"role": "user", "content": [
-                {"type": "tool_result", "tool_use_id": "123", "content": "File written"}
-            ]}
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": "123",
+                        "content": "File written",
+                    }
+                ],
+            }
         ]
 
         converted = adapter._convert_messages(messages, system=None)
@@ -395,10 +422,18 @@ class TestOpenAIAdapter:
 
         adapter = OpenAIAdapter(api_key="test-key")
         messages = [
-            {"role": "assistant", "content": [
-                {"type": "text", "text": "I'll write a file"},
-                {"type": "tool_use", "id": "456", "name": "write_file", "input": {"path": "/tmp"}}
-            ]}
+            {
+                "role": "assistant",
+                "content": [
+                    {"type": "text", "text": "I'll write a file"},
+                    {
+                        "type": "tool_use",
+                        "id": "456",
+                        "name": "write_file",
+                        "input": {"path": "/tmp"},
+                    },
+                ],
+            }
         ]
 
         converted = adapter._convert_messages(messages, system=None)
@@ -435,11 +470,13 @@ class TestGrokAdapter:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "choices": [{
-                "message": {"content": "Hello", "tool_calls": None},
-                "finish_reason": "stop"
-            }],
-            "usage": {"prompt_tokens": 10, "completion_tokens": 5}
+            "choices": [
+                {
+                    "message": {"content": "Hello", "tool_calls": None},
+                    "finish_reason": "stop",
+                }
+            ],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 5},
         }
 
         mock_client = Mock()

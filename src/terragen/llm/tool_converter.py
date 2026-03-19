@@ -45,12 +45,10 @@ def anthropic_to_openai(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "function": {
                 "name": tool["name"],
                 "description": tool.get("description", ""),
-                "parameters": tool.get("input_schema", {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                })
-            }
+                "parameters": tool.get(
+                    "input_schema", {"type": "object", "properties": {}, "required": []}
+                ),
+            },
         }
         converted.append(openai_tool)
 
@@ -72,11 +70,9 @@ def openai_to_anthropic(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
             anthropic_tool = {
                 "name": func["name"],
                 "description": func.get("description", ""),
-                "input_schema": func.get("parameters", {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                })
+                "input_schema": func.get(
+                    "parameters", {"type": "object", "properties": {}, "required": []}
+                ),
             }
             converted.append(anthropic_tool)
 
