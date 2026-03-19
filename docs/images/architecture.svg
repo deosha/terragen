@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bgGrad3)" rx="10"/>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="18" font-weight="600">TerraGen Architecture</text>
+
+  <!-- Web UI Box -->
+  <g transform="translate(50, 50)">
+    <rect width="200" height="140" rx="8" fill="#1e3a5f" stroke="#63b3ed" stroke-width="2"/>
+    <text x="100" y="25" text-anchor="middle" fill="#63b3ed" font-family="system-ui" font-size="14" font-weight="600">Web UI</text>
+    <text x="100" y="50" text-anchor="middle" fill="#a0aec0" font-family="system-ui" font-size="11">Next.js + React</text>
+    <line x1="20" y1="65" x2="180" y2="65" stroke="#4a5568" stroke-width="1"/>
+    <text x="100" y="85" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Chat Interface</text>
+    <text x="100" y="100" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Prompt Builder</text>
+    <text x="100" y="115" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Diagram Upload</text>
+    <text x="100" y="130" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Code Editor</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M255 120 L295 120" stroke="#63b3ed" stroke-width="2" fill="none" marker-end="url(#arrow3)"/>
+
+  <!-- API Box -->
+  <g transform="translate(300, 50)">
+    <rect width="200" height="140" rx="8" fill="#1e3a5f" stroke="#68d391" stroke-width="2"/>
+    <text x="100" y="25" text-anchor="middle" fill="#68d391" font-family="system-ui" font-size="14" font-weight="600">API Server</text>
+    <text x="100" y="50" text-anchor="middle" fill="#a0aec0" font-family="system-ui" font-size="11">FastAPI + Python</text>
+    <line x1="20" y1="65" x2="180" y2="65" stroke="#4a5568" stroke-width="1"/>
+    <text x="100" y="85" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• OAuth (GitHub/GitLab)</text>
+    <text x="100" y="100" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Generate Endpoint</text>
+    <text x="100" y="115" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• SSE Streaming</text>
+    <text x="100" y="130" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Session Management</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M505 120 L545 120" stroke="#68d391" stroke-width="2" fill="none"/>
+
+  <!-- Core Box -->
+  <g transform="translate(550, 50)">
+    <rect width="200" height="140" rx="8" fill="#1e3a5f" stroke="#f6ad55" stroke-width="2"/>
+    <text x="100" y="25" text-anchor="middle" fill="#f6ad55" font-family="system-ui" font-size="14" font-weight="600">TerraGen Core</text>
+    <text x="100" y="50" text-anchor="middle" fill="#a0aec0" font-family="system-ui" font-size="11">Multi-Agent Pipeline</text>
+    <line x1="20" y1="65" x2="180" y2="65" stroke="#4a5568" stroke-width="1"/>
+    <text x="100" y="85" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Code Generation</text>
+    <text x="100" y="100" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Validation Agent</text>
+    <text x="100" y="115" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Vision Analysis</text>
+    <text x="100" y="130" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">• Cost Estimation</text>
+  </g>
+
+  <!-- LLM Providers Box -->
+  <g transform="translate(300, 220)">
+    <rect width="450" height="80" rx="8" fill="#1a202c" stroke="#9f7aea" stroke-width="2"/>
+    <text x="225" y="25" text-anchor="middle" fill="#9f7aea" font-family="system-ui" font-size="14" font-weight="600">LLM Providers (with fallback)</text>
+    <g transform="translate(30, 40)">
+      <rect width="85" height="30" rx="4" fill="#2d3748"/>
+      <text x="42" y="20" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">Anthropic</text>
+    </g>
+    <g transform="translate(125, 40)">
+      <rect width="85" height="30" rx="4" fill="#2d3748"/>
+      <text x="42" y="20" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">OpenAI</text>
+    </g>
+    <g transform="translate(220, 40)">
+      <rect width="85" height="30" rx="4" fill="#2d3748"/>
+      <text x="42" y="20" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">xAI Grok</text>
+    </g>
+    <g transform="translate(315, 40)">
+      <rect width="85" height="30" rx="4" fill="#2d3748"/>
+      <text x="42" y="20" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10">DeepSeek</text>
+    </g>
+    <!-- Arrows between providers -->
+    <text x="118" y="58" fill="#4a5568" font-family="system-ui" font-size="10">→</text>
+    <text x="213" y="58" fill="#4a5568" font-family="system-ui" font-size="10">→</text>
+    <text x="308" y="58" fill="#4a5568" font-family="system-ui" font-size="10">→</text>
+  </g>
+
+  <!-- Tools Box -->
+  <g transform="translate(50, 320)">
+    <rect width="700" height="60" rx="8" fill="#1a202c" stroke="#4a5568" stroke-width="1"/>
+    <text x="350" y="20" text-anchor="middle" fill="#a0aec0" font-family="system-ui" font-size="12" font-weight="600">Tools & Integrations</text>
+    <g transform="translate(40, 30)">
+      <text x="0" y="15" fill="#68d391" font-family="system-ui" font-size="10">terraform</text>
+    </g>
+    <g transform="translate(120, 30)">
+      <text x="0" y="15" fill="#f6ad55" font-family="system-ui" font-size="10">tfsec</text>
+    </g>
+    <g transform="translate(180, 30)">
+      <text x="0" y="15" fill="#fc8181" font-family="system-ui" font-size="10">checkov</text>
+    </g>
+    <g transform="translate(260, 30)">
+      <text x="0" y="15" fill="#9f7aea" font-family="system-ui" font-size="10">infracost</text>
+    </g>
+    <g transform="translate(350, 30)">
+      <text x="0" y="15" fill="#63b3ed" font-family="system-ui" font-size="10">conftest</text>
+    </g>
+    <g transform="translate(430, 30)">
+      <text x="0" y="15" fill="#68d391" font-family="system-ui" font-size="10">git</text>
+    </g>
+    <g transform="translate(480, 30)">
+      <text x="0" y="15" fill="#a0aec0" font-family="system-ui" font-size="10">AWS/GCP/Azure</text>
+    </g>
+    <g transform="translate(600, 30)">
+      <text x="0" y="15" fill="#f6ad55" font-family="system-ui" font-size="10">GitHub API</text>
+    </g>
+  </g>
+
+  <!-- Connecting lines -->
+  <path d="M400 190 L525 220" stroke="#9f7aea" stroke-width="1" stroke-dasharray="4" fill="none"/>
+  <path d="M650 190 L525 220" stroke="#9f7aea" stroke-width="1" stroke-dasharray="4" fill="none"/>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrow3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#63b3ed"/>
+    </marker>
+  </defs>
+</svg>

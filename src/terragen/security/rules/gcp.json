@@ -1,0 +1,205 @@
+{
+  "provider": "gcp",
+  "rules": [
+    {
+      "id": "GCP001",
+      "severity": "HIGH",
+      "title": "GCS bucket without encryption",
+      "description": "GCS bucket is not using customer-managed encryption keys",
+      "resource_type": "google_storage_bucket",
+      "pattern": "resource\\s+\"google_storage_bucket\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "encryption"
+      ],
+      "remediation": "Add encryption block with default_kms_key_name"
+    },
+    {
+      "id": "GCP002",
+      "severity": "HIGH",
+      "title": "GCS bucket publicly accessible",
+      "description": "GCS bucket allows public access",
+      "resource_type": "google_storage_bucket_iam",
+      "pattern": "member\\s*=\\s*\"allUsers\"|member\\s*=\\s*\"allAuthenticatedUsers\"",
+      "anti_patterns": [],
+      "remediation": "Remove allUsers and allAuthenticatedUsers IAM bindings"
+    },
+    {
+      "id": "GCP003",
+      "severity": "MEDIUM",
+      "title": "GCS bucket without versioning",
+      "description": "GCS bucket does not have versioning enabled",
+      "resource_type": "google_storage_bucket",
+      "pattern": "resource\\s+\"google_storage_bucket\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "versioning\\s*\\{[^}]*enabled\\s*=\\s*true"
+      ],
+      "remediation": "Add versioning block with enabled = true"
+    },
+    {
+      "id": "GCP004",
+      "severity": "MEDIUM",
+      "title": "GCS bucket without logging",
+      "description": "GCS bucket does not have access logging enabled",
+      "resource_type": "google_storage_bucket",
+      "pattern": "resource\\s+\"google_storage_bucket\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "logging"
+      ],
+      "remediation": "Add logging block with log_bucket"
+    },
+    {
+      "id": "GCP005",
+      "severity": "CRITICAL",
+      "title": "Firewall allows unrestricted SSH",
+      "description": "Firewall rule allows SSH (port 22) from 0.0.0.0/0",
+      "resource_type": "google_compute_firewall",
+      "pattern": "allow\\s*\\{[^}]*ports\\s*=\\s*\\[.*\"22\".*\\][^}]*\\}[^}]*source_ranges\\s*=\\s*\\[.*\"0\\.0\\.0\\.0/0\"",
+      "anti_patterns": [],
+      "remediation": "Restrict SSH access to specific IP ranges or use IAP"
+    },
+    {
+      "id": "GCP006",
+      "severity": "CRITICAL",
+      "title": "Firewall allows unrestricted RDP",
+      "description": "Firewall rule allows RDP (port 3389) from 0.0.0.0/0",
+      "resource_type": "google_compute_firewall",
+      "pattern": "allow\\s*\\{[^}]*ports\\s*=\\s*\\[.*\"3389\".*\\][^}]*\\}[^}]*source_ranges\\s*=\\s*\\[.*\"0\\.0\\.0\\.0/0\"",
+      "anti_patterns": [],
+      "remediation": "Restrict RDP access to specific IP ranges or use IAP"
+    },
+    {
+      "id": "GCP007",
+      "severity": "HIGH",
+      "title": "Cloud SQL without SSL enforcement",
+      "description": "Cloud SQL instance does not require SSL connections",
+      "resource_type": "google_sql_database_instance",
+      "pattern": "resource\\s+\"google_sql_database_instance\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "require_ssl\\s*=\\s*true"
+      ],
+      "remediation": "Add settings.ip_configuration.require_ssl = true"
+    },
+    {
+      "id": "GCP008",
+      "severity": "HIGH",
+      "title": "Cloud SQL publicly accessible",
+      "description": "Cloud SQL instance has public IP enabled",
+      "resource_type": "google_sql_database_instance",
+      "pattern": "ipv4_enabled\\s*=\\s*true",
+      "anti_patterns": [],
+      "remediation": "Set ipv4_enabled = false and use private IP"
+    },
+    {
+      "id": "GCP009",
+      "severity": "MEDIUM",
+      "title": "Cloud SQL without backup",
+      "description": "Cloud SQL instance does not have automated backups enabled",
+      "resource_type": "google_sql_database_instance",
+      "pattern": "resource\\s+\"google_sql_database_instance\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "backup_configuration\\s*\\{[^}]*enabled\\s*=\\s*true"
+      ],
+      "remediation": "Add backup_configuration with enabled = true"
+    },
+    {
+      "id": "GCP010",
+      "severity": "HIGH",
+      "title": "GKE cluster without network policy",
+      "description": "GKE cluster does not have network policy enabled",
+      "resource_type": "google_container_cluster",
+      "pattern": "resource\\s+\"google_container_cluster\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "network_policy"
+      ],
+      "remediation": "Add network_policy block with enabled = true"
+    },
+    {
+      "id": "GCP011",
+      "severity": "HIGH",
+      "title": "GKE cluster with legacy auth",
+      "description": "GKE cluster has legacy ABAC authorization enabled",
+      "resource_type": "google_container_cluster",
+      "pattern": "enable_legacy_abac\\s*=\\s*true",
+      "anti_patterns": [],
+      "remediation": "Set enable_legacy_abac = false"
+    },
+    {
+      "id": "GCP012",
+      "severity": "HIGH",
+      "title": "GKE node without shielded instance",
+      "description": "GKE nodes do not have shielded instance features enabled",
+      "resource_type": "google_container_node_pool",
+      "pattern": "resource\\s+\"google_container_node_pool\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "shielded_instance_config"
+      ],
+      "remediation": "Add shielded_instance_config with enable_secure_boot and enable_integrity_monitoring"
+    },
+    {
+      "id": "GCP013",
+      "severity": "HIGH",
+      "title": "Compute instance with public IP",
+      "description": "Compute instance has an external IP address assigned",
+      "resource_type": "google_compute_instance",
+      "pattern": "access_config\\s*\\{",
+      "anti_patterns": [],
+      "remediation": "Remove access_config block to use only internal IP"
+    },
+    {
+      "id": "GCP014",
+      "severity": "HIGH",
+      "title": "Compute disk without encryption",
+      "description": "Compute disk is not using customer-managed encryption keys",
+      "resource_type": "google_compute_disk",
+      "pattern": "resource\\s+\"google_compute_disk\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "disk_encryption_key"
+      ],
+      "remediation": "Add disk_encryption_key block with kms_key_self_link"
+    },
+    {
+      "id": "GCP015",
+      "severity": "MEDIUM",
+      "title": "VPC without flow logs",
+      "description": "VPC subnet does not have flow logs enabled",
+      "resource_type": "google_compute_subnetwork",
+      "pattern": "resource\\s+\"google_compute_subnetwork\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "log_config"
+      ],
+      "remediation": "Add log_config block to enable VPC flow logs"
+    },
+    {
+      "id": "GCP016",
+      "severity": "HIGH",
+      "title": "BigQuery dataset publicly accessible",
+      "description": "BigQuery dataset allows public access",
+      "resource_type": "google_bigquery_dataset",
+      "pattern": "special_group\\s*=\\s*\"allAuthenticatedUsers\"|special_group\\s*=\\s*\"allUsers\"",
+      "anti_patterns": [],
+      "remediation": "Remove allUsers and allAuthenticatedUsers access"
+    },
+    {
+      "id": "GCP017",
+      "severity": "CRITICAL",
+      "title": "Hardcoded GCP credentials",
+      "description": "GCP service account key is hardcoded in the configuration",
+      "resource_type": "any",
+      "pattern": "\"type\"\\s*:\\s*\"service_account\"[^}]*\"private_key\"",
+      "anti_patterns": [],
+      "remediation": "Use workload identity, environment variables, or Secret Manager"
+    },
+    {
+      "id": "GCP018",
+      "severity": "HIGH",
+      "title": "Pub/Sub topic without encryption",
+      "description": "Pub/Sub topic is not encrypted with CMEK",
+      "resource_type": "google_pubsub_topic",
+      "pattern": "resource\\s+\"google_pubsub_topic\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "kms_key_name"
+      ],
+      "remediation": "Add kms_key_name to encrypt Pub/Sub messages with CMEK"
+    }
+  ]
+}

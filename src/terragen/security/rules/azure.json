@@ -1,0 +1,250 @@
+{
+  "provider": "azure",
+  "rules": [
+    {
+      "id": "AZR001",
+      "severity": "HIGH",
+      "title": "Storage account without encryption",
+      "description": "Storage account is not using customer-managed encryption keys",
+      "resource_type": "azurerm_storage_account",
+      "pattern": "resource\\s+\"azurerm_storage_account\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "customer_managed_key"
+      ],
+      "remediation": "Add customer_managed_key block with key_vault_key_id"
+    },
+    {
+      "id": "AZR002",
+      "severity": "HIGH",
+      "title": "Storage account allows public blob access",
+      "description": "Storage account allows public access to blobs",
+      "resource_type": "azurerm_storage_account",
+      "pattern": "allow_blob_public_access\\s*=\\s*true|allow_nested_items_to_be_public\\s*=\\s*true",
+      "anti_patterns": [],
+      "remediation": "Set allow_nested_items_to_be_public = false"
+    },
+    {
+      "id": "AZR003",
+      "severity": "HIGH",
+      "title": "Storage account without HTTPS enforcement",
+      "description": "Storage account does not enforce HTTPS-only traffic",
+      "resource_type": "azurerm_storage_account",
+      "pattern": "enable_https_traffic_only\\s*=\\s*false",
+      "anti_patterns": [],
+      "remediation": "Set enable_https_traffic_only = true"
+    },
+    {
+      "id": "AZR004",
+      "severity": "MEDIUM",
+      "title": "Storage account without network rules",
+      "description": "Storage account allows access from all networks",
+      "resource_type": "azurerm_storage_account",
+      "pattern": "resource\\s+\"azurerm_storage_account\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "network_rules"
+      ],
+      "remediation": "Add network_rules block with default_action = Deny"
+    },
+    {
+      "id": "AZR005",
+      "severity": "CRITICAL",
+      "title": "NSG allows unrestricted SSH",
+      "description": "Network security group allows SSH (port 22) from any source",
+      "resource_type": "azurerm_network_security_rule",
+      "pattern": "destination_port_range\\s*=\\s*\"22\"[^}]*source_address_prefix\\s*=\\s*\"\\*\"",
+      "anti_patterns": [],
+      "remediation": "Restrict SSH access to specific IP ranges"
+    },
+    {
+      "id": "AZR006",
+      "severity": "CRITICAL",
+      "title": "NSG allows unrestricted RDP",
+      "description": "Network security group allows RDP (port 3389) from any source",
+      "resource_type": "azurerm_network_security_rule",
+      "pattern": "destination_port_range\\s*=\\s*\"3389\"[^}]*source_address_prefix\\s*=\\s*\"\\*\"",
+      "anti_patterns": [],
+      "remediation": "Restrict RDP access to specific IP ranges"
+    },
+    {
+      "id": "AZR007",
+      "severity": "HIGH",
+      "title": "SQL Server without auditing",
+      "description": "Azure SQL Server does not have auditing enabled",
+      "resource_type": "azurerm_mssql_server",
+      "pattern": "resource\\s+\"azurerm_mssql_server\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "azurerm_mssql_server_extended_auditing_policy"
+      ],
+      "remediation": "Add azurerm_mssql_server_extended_auditing_policy resource"
+    },
+    {
+      "id": "AZR008",
+      "severity": "HIGH",
+      "title": "SQL Database without TDE",
+      "description": "Azure SQL Database does not have Transparent Data Encryption enabled",
+      "resource_type": "azurerm_mssql_database",
+      "pattern": "resource\\s+\"azurerm_mssql_database\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "transparent_data_encryption_enabled\\s*=\\s*true"
+      ],
+      "remediation": "Ensure transparent_data_encryption_enabled = true (default in newer provider versions)"
+    },
+    {
+      "id": "AZR009",
+      "severity": "HIGH",
+      "title": "SQL Server publicly accessible",
+      "description": "Azure SQL Server allows public network access",
+      "resource_type": "azurerm_mssql_server",
+      "pattern": "public_network_access_enabled\\s*=\\s*true",
+      "anti_patterns": [],
+      "remediation": "Set public_network_access_enabled = false and use private endpoints"
+    },
+    {
+      "id": "AZR010",
+      "severity": "HIGH",
+      "title": "Key Vault without purge protection",
+      "description": "Key Vault does not have purge protection enabled",
+      "resource_type": "azurerm_key_vault",
+      "pattern": "resource\\s+\"azurerm_key_vault\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "purge_protection_enabled\\s*=\\s*true"
+      ],
+      "remediation": "Set purge_protection_enabled = true"
+    },
+    {
+      "id": "AZR011",
+      "severity": "MEDIUM",
+      "title": "Key Vault without soft delete",
+      "description": "Key Vault does not have soft delete enabled",
+      "resource_type": "azurerm_key_vault",
+      "pattern": "soft_delete_retention_days\\s*=\\s*0",
+      "anti_patterns": [],
+      "remediation": "Set soft_delete_retention_days to at least 7"
+    },
+    {
+      "id": "AZR012",
+      "severity": "HIGH",
+      "title": "AKS cluster without RBAC",
+      "description": "AKS cluster does not have Azure RBAC enabled",
+      "resource_type": "azurerm_kubernetes_cluster",
+      "pattern": "resource\\s+\"azurerm_kubernetes_cluster\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "azure_active_directory_role_based_access_control"
+      ],
+      "remediation": "Add azure_active_directory_role_based_access_control block"
+    },
+    {
+      "id": "AZR013",
+      "severity": "HIGH",
+      "title": "AKS cluster without network policy",
+      "description": "AKS cluster does not have network policy configured",
+      "resource_type": "azurerm_kubernetes_cluster",
+      "pattern": "resource\\s+\"azurerm_kubernetes_cluster\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "network_policy"
+      ],
+      "remediation": "Add network_profile block with network_policy = azure or calico"
+    },
+    {
+      "id": "AZR014",
+      "severity": "HIGH",
+      "title": "AKS API server publicly accessible",
+      "description": "AKS cluster API server is publicly accessible",
+      "resource_type": "azurerm_kubernetes_cluster",
+      "pattern": "resource\\s+\"azurerm_kubernetes_cluster\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "private_cluster_enabled\\s*=\\s*true"
+      ],
+      "remediation": "Set private_cluster_enabled = true"
+    },
+    {
+      "id": "AZR015",
+      "severity": "HIGH",
+      "title": "VM without disk encryption",
+      "description": "Virtual machine disk is not encrypted",
+      "resource_type": "azurerm_managed_disk",
+      "pattern": "resource\\s+\"azurerm_managed_disk\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "encryption_settings",
+        "disk_encryption_set_id"
+      ],
+      "remediation": "Add disk_encryption_set_id or encryption_settings block"
+    },
+    {
+      "id": "AZR016",
+      "severity": "MEDIUM",
+      "title": "VNet without DDoS protection",
+      "description": "Virtual network does not have DDoS protection enabled",
+      "resource_type": "azurerm_virtual_network",
+      "pattern": "resource\\s+\"azurerm_virtual_network\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "ddos_protection_plan"
+      ],
+      "remediation": "Add ddos_protection_plan block"
+    },
+    {
+      "id": "AZR017",
+      "severity": "MEDIUM",
+      "title": "NSG without flow logs",
+      "description": "Network security group does not have flow logs enabled",
+      "resource_type": "azurerm_network_security_group",
+      "pattern": "resource\\s+\"azurerm_network_security_group\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "azurerm_network_watcher_flow_log"
+      ],
+      "remediation": "Add azurerm_network_watcher_flow_log resource"
+    },
+    {
+      "id": "AZR018",
+      "severity": "HIGH",
+      "title": "App Service without HTTPS enforcement",
+      "description": "App Service does not enforce HTTPS-only connections",
+      "resource_type": "azurerm_app_service",
+      "pattern": "https_only\\s*=\\s*false",
+      "anti_patterns": [],
+      "remediation": "Set https_only = true"
+    },
+    {
+      "id": "AZR019",
+      "severity": "HIGH",
+      "title": "App Service with FTP enabled",
+      "description": "App Service has FTP deployment enabled",
+      "resource_type": "azurerm_app_service",
+      "pattern": "ftps_state\\s*=\\s*\"AllAllowed\"",
+      "anti_patterns": [],
+      "remediation": "Set ftps_state = Disabled or FtpsOnly"
+    },
+    {
+      "id": "AZR020",
+      "severity": "CRITICAL",
+      "title": "Hardcoded Azure credentials",
+      "description": "Azure credentials are hardcoded in the configuration",
+      "resource_type": "any",
+      "pattern": "client_secret\\s*=\\s*\"[^\"]+\"|subscription_id\\s*=\\s*\"[0-9a-f-]{36}\".*client_id\\s*=\\s*\"[0-9a-f-]{36}\".*client_secret",
+      "anti_patterns": [],
+      "remediation": "Use managed identity, environment variables, or Key Vault"
+    },
+    {
+      "id": "AZR021",
+      "severity": "HIGH",
+      "title": "Cosmos DB without encryption",
+      "description": "Cosmos DB account is not using customer-managed keys",
+      "resource_type": "azurerm_cosmosdb_account",
+      "pattern": "resource\\s+\"azurerm_cosmosdb_account\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "key_vault_key_id"
+      ],
+      "remediation": "Add key_vault_key_id for customer-managed encryption"
+    },
+    {
+      "id": "AZR022",
+      "severity": "HIGH",
+      "title": "Function App without HTTPS enforcement",
+      "description": "Function App does not enforce HTTPS-only connections",
+      "resource_type": "azurerm_function_app",
+      "pattern": "https_only\\s*=\\s*false",
+      "anti_patterns": [],
+      "remediation": "Set https_only = true"
+    }
+  ]
+}

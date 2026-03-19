@@ -1,0 +1,351 @@
+{
+  "categories": [
+    {
+      "id": "compute",
+      "name": "Compute",
+      "icon": "cpu"
+    },
+    {
+      "id": "containers",
+      "name": "Containers & Orchestration",
+      "icon": "boxes"
+    },
+    {
+      "id": "serverless",
+      "name": "Serverless",
+      "icon": "zap"
+    },
+    {
+      "id": "database",
+      "name": "Databases",
+      "icon": "database"
+    },
+    {
+      "id": "storage",
+      "name": "Storage",
+      "icon": "hard-drive"
+    },
+    {
+      "id": "networking",
+      "name": "Networking",
+      "icon": "network"
+    },
+    {
+      "id": "security",
+      "name": "Security & Identity",
+      "icon": "shield"
+    },
+    {
+      "id": "messaging",
+      "name": "Messaging & Events",
+      "icon": "radio"
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics & BI",
+      "icon": "bar-chart"
+    },
+    {
+      "id": "ml",
+      "name": "Machine Learning",
+      "icon": "brain"
+    },
+    {
+      "id": "monitoring",
+      "name": "Monitoring & Logging",
+      "icon": "activity"
+    },
+    {
+      "id": "devops",
+      "name": "DevOps & CI/CD",
+      "icon": "git-branch"
+    },
+    {
+      "id": "cdn",
+      "name": "CDN & Edge",
+      "icon": "globe"
+    }
+  ],
+  "services": {
+    "aws": [
+      { "id": "ec2", "name": "EC2", "category": "compute", "description": "Virtual servers" },
+      { "id": "ec2-auto-scaling", "name": "EC2 Auto Scaling", "category": "compute", "description": "Auto-scale EC2 instances" },
+      { "id": "lightsail", "name": "Lightsail", "category": "compute", "description": "Simple virtual servers" },
+      { "id": "batch", "name": "AWS Batch", "category": "compute", "description": "Batch computing jobs" },
+
+      { "id": "ecs", "name": "ECS", "category": "containers", "description": "Container orchestration" },
+      { "id": "eks", "name": "EKS", "category": "containers", "description": "Managed Kubernetes" },
+      { "id": "fargate", "name": "Fargate", "category": "containers", "description": "Serverless containers" },
+      { "id": "ecr", "name": "ECR", "category": "containers", "description": "Container registry" },
+      { "id": "app-runner", "name": "App Runner", "category": "containers", "description": "Container web apps" },
+
+      { "id": "lambda", "name": "Lambda", "category": "serverless", "description": "Serverless functions" },
+      { "id": "api-gateway", "name": "API Gateway", "category": "serverless", "description": "API management" },
+      { "id": "step-functions", "name": "Step Functions", "category": "serverless", "description": "Workflow orchestration" },
+      { "id": "eventbridge", "name": "EventBridge", "category": "serverless", "description": "Event bus" },
+
+      { "id": "rds", "name": "RDS", "category": "database", "description": "Managed relational DB" },
+      { "id": "rds-mysql", "name": "RDS MySQL", "category": "database", "description": "Managed MySQL" },
+      { "id": "rds-postgres", "name": "RDS PostgreSQL", "category": "database", "description": "Managed PostgreSQL" },
+      { "id": "aurora", "name": "Aurora", "category": "database", "description": "High-performance relational DB" },
+      { "id": "aurora-serverless", "name": "Aurora Serverless", "category": "database", "description": "Auto-scaling Aurora" },
+      { "id": "dynamodb", "name": "DynamoDB", "category": "database", "description": "NoSQL database" },
+      { "id": "elasticache-redis", "name": "ElastiCache Redis", "category": "database", "description": "Managed Redis" },
+      { "id": "elasticache-memcached", "name": "ElastiCache Memcached", "category": "database", "description": "Managed Memcached" },
+      { "id": "documentdb", "name": "DocumentDB", "category": "database", "description": "MongoDB-compatible" },
+      { "id": "neptune", "name": "Neptune", "category": "database", "description": "Graph database" },
+      { "id": "timestream", "name": "Timestream", "category": "database", "description": "Time-series database" },
+      { "id": "keyspaces", "name": "Keyspaces", "category": "database", "description": "Cassandra-compatible" },
+      { "id": "memorydb", "name": "MemoryDB", "category": "database", "description": "Redis-compatible durable DB" },
+
+      { "id": "s3", "name": "S3", "category": "storage", "description": "Object storage" },
+      { "id": "s3-glacier", "name": "S3 Glacier", "category": "storage", "description": "Archive storage" },
+      { "id": "efs", "name": "EFS", "category": "storage", "description": "Elastic file system" },
+      { "id": "fsx-lustre", "name": "FSx for Lustre", "category": "storage", "description": "High-performance file system" },
+      { "id": "fsx-windows", "name": "FSx for Windows", "category": "storage", "description": "Windows file server" },
+      { "id": "ebs", "name": "EBS", "category": "storage", "description": "Block storage volumes" },
+      { "id": "storage-gateway", "name": "Storage Gateway", "category": "storage", "description": "Hybrid storage" },
+
+      { "id": "vpc", "name": "VPC", "category": "networking", "description": "Virtual private cloud" },
+      { "id": "alb", "name": "Application Load Balancer", "category": "networking", "description": "Layer 7 load balancer" },
+      { "id": "nlb", "name": "Network Load Balancer", "category": "networking", "description": "Layer 4 load balancer" },
+      { "id": "route53", "name": "Route 53", "category": "networking", "description": "DNS service" },
+      { "id": "cloudfront", "name": "CloudFront", "category": "cdn", "description": "CDN" },
+      { "id": "global-accelerator", "name": "Global Accelerator", "category": "networking", "description": "Network accelerator" },
+      { "id": "direct-connect", "name": "Direct Connect", "category": "networking", "description": "Dedicated network" },
+      { "id": "transit-gateway", "name": "Transit Gateway", "category": "networking", "description": "Network hub" },
+      { "id": "privatelink", "name": "PrivateLink", "category": "networking", "description": "Private connectivity" },
+      { "id": "nat-gateway", "name": "NAT Gateway", "category": "networking", "description": "NAT for private subnets" },
+      { "id": "vpn", "name": "Site-to-Site VPN", "category": "networking", "description": "VPN connection" },
+      { "id": "client-vpn", "name": "Client VPN", "category": "networking", "description": "Client VPN endpoint" },
+
+      { "id": "iam", "name": "IAM", "category": "security", "description": "Identity management" },
+      { "id": "cognito", "name": "Cognito", "category": "security", "description": "User authentication" },
+      { "id": "secrets-manager", "name": "Secrets Manager", "category": "security", "description": "Secrets management" },
+      { "id": "kms", "name": "KMS", "category": "security", "description": "Key management" },
+      { "id": "waf", "name": "WAF", "category": "security", "description": "Web application firewall" },
+      { "id": "shield", "name": "Shield", "category": "security", "description": "DDoS protection" },
+      { "id": "guardduty", "name": "GuardDuty", "category": "security", "description": "Threat detection" },
+      { "id": "security-hub", "name": "Security Hub", "category": "security", "description": "Security posture" },
+      { "id": "inspector", "name": "Inspector", "category": "security", "description": "Vulnerability scanning" },
+      { "id": "acm", "name": "ACM", "category": "security", "description": "SSL/TLS certificates" },
+
+      { "id": "sqs", "name": "SQS", "category": "messaging", "description": "Message queue" },
+      { "id": "sns", "name": "SNS", "category": "messaging", "description": "Pub/sub messaging" },
+      { "id": "kinesis", "name": "Kinesis Data Streams", "category": "messaging", "description": "Real-time streaming" },
+      { "id": "kinesis-firehose", "name": "Kinesis Firehose", "category": "messaging", "description": "Data delivery" },
+      { "id": "msk", "name": "MSK (Kafka)", "category": "messaging", "description": "Managed Kafka" },
+      { "id": "mq", "name": "Amazon MQ", "category": "messaging", "description": "Message broker" },
+
+      { "id": "redshift", "name": "Redshift", "category": "analytics", "description": "Data warehouse" },
+      { "id": "athena", "name": "Athena", "category": "analytics", "description": "SQL query service" },
+      { "id": "glue", "name": "Glue", "category": "analytics", "description": "ETL service" },
+      { "id": "glue-catalog", "name": "Glue Data Catalog", "category": "analytics", "description": "Metadata catalog" },
+      { "id": "emr", "name": "EMR", "category": "analytics", "description": "Big data processing" },
+      { "id": "kinesis-analytics", "name": "Kinesis Analytics", "category": "analytics", "description": "Stream analytics" },
+      { "id": "quicksight", "name": "QuickSight", "category": "analytics", "description": "BI dashboards" },
+      { "id": "lake-formation", "name": "Lake Formation", "category": "analytics", "description": "Data lake governance" },
+      { "id": "opensearch", "name": "OpenSearch", "category": "analytics", "description": "Search & analytics" },
+
+      { "id": "sagemaker", "name": "SageMaker", "category": "ml", "description": "ML platform" },
+      { "id": "sagemaker-endpoint", "name": "SageMaker Endpoint", "category": "ml", "description": "Model serving" },
+      { "id": "sagemaker-feature-store", "name": "SageMaker Feature Store", "category": "ml", "description": "ML feature store" },
+      { "id": "bedrock", "name": "Bedrock", "category": "ml", "description": "Foundation models" },
+      { "id": "comprehend", "name": "Comprehend", "category": "ml", "description": "NLP service" },
+      { "id": "rekognition", "name": "Rekognition", "category": "ml", "description": "Image analysis" },
+      { "id": "textract", "name": "Textract", "category": "ml", "description": "Document extraction" },
+      { "id": "transcribe", "name": "Transcribe", "category": "ml", "description": "Speech-to-text" },
+      { "id": "polly", "name": "Polly", "category": "ml", "description": "Text-to-speech" },
+
+      { "id": "cloudwatch", "name": "CloudWatch", "category": "monitoring", "description": "Monitoring & logs" },
+      { "id": "cloudwatch-alarms", "name": "CloudWatch Alarms", "category": "monitoring", "description": "Metric alarms" },
+      { "id": "xray", "name": "X-Ray", "category": "monitoring", "description": "Distributed tracing" },
+      { "id": "cloudtrail", "name": "CloudTrail", "category": "monitoring", "description": "API audit logs" },
+      { "id": "config", "name": "AWS Config", "category": "monitoring", "description": "Resource compliance" },
+
+      { "id": "codepipeline", "name": "CodePipeline", "category": "devops", "description": "CI/CD pipeline" },
+      { "id": "codebuild", "name": "CodeBuild", "category": "devops", "description": "Build service" },
+      { "id": "codedeploy", "name": "CodeDeploy", "category": "devops", "description": "Deployment service" },
+      { "id": "codecommit", "name": "CodeCommit", "category": "devops", "description": "Git repository" },
+      { "id": "codeartifact", "name": "CodeArtifact", "category": "devops", "description": "Artifact repository" }
+    ],
+    "gcp": [
+      { "id": "compute-engine", "name": "Compute Engine", "category": "compute", "description": "Virtual machines" },
+      { "id": "instance-groups", "name": "Managed Instance Groups", "category": "compute", "description": "Auto-scaling VMs" },
+      { "id": "sole-tenant", "name": "Sole-Tenant Nodes", "category": "compute", "description": "Dedicated hosts" },
+
+      { "id": "gke", "name": "GKE", "category": "containers", "description": "Managed Kubernetes" },
+      { "id": "gke-autopilot", "name": "GKE Autopilot", "category": "containers", "description": "Serverless Kubernetes" },
+      { "id": "cloud-run", "name": "Cloud Run", "category": "containers", "description": "Serverless containers" },
+      { "id": "artifact-registry", "name": "Artifact Registry", "category": "containers", "description": "Container/artifact registry" },
+
+      { "id": "cloud-functions", "name": "Cloud Functions", "category": "serverless", "description": "Serverless functions" },
+      { "id": "cloud-functions-v2", "name": "Cloud Functions v2", "category": "serverless", "description": "2nd gen functions" },
+      { "id": "api-gateway-gcp", "name": "API Gateway", "category": "serverless", "description": "API management" },
+      { "id": "cloud-endpoints", "name": "Cloud Endpoints", "category": "serverless", "description": "API endpoints" },
+      { "id": "workflows", "name": "Workflows", "category": "serverless", "description": "Workflow orchestration" },
+      { "id": "cloud-scheduler", "name": "Cloud Scheduler", "category": "serverless", "description": "Cron jobs" },
+      { "id": "cloud-tasks", "name": "Cloud Tasks", "category": "serverless", "description": "Task queues" },
+
+      { "id": "cloud-sql", "name": "Cloud SQL", "category": "database", "description": "Managed SQL" },
+      { "id": "cloud-sql-mysql", "name": "Cloud SQL MySQL", "category": "database", "description": "Managed MySQL" },
+      { "id": "cloud-sql-postgres", "name": "Cloud SQL PostgreSQL", "category": "database", "description": "Managed PostgreSQL" },
+      { "id": "alloydb", "name": "AlloyDB", "category": "database", "description": "PostgreSQL-compatible" },
+      { "id": "spanner", "name": "Cloud Spanner", "category": "database", "description": "Global relational DB" },
+      { "id": "firestore", "name": "Firestore", "category": "database", "description": "NoSQL database" },
+      { "id": "bigtable", "name": "Bigtable", "category": "database", "description": "Wide-column store" },
+      { "id": "memorystore-redis", "name": "Memorystore Redis", "category": "database", "description": "Managed Redis" },
+      { "id": "memorystore-memcached", "name": "Memorystore Memcached", "category": "database", "description": "Managed Memcached" },
+      { "id": "mongodb-atlas-gcp", "name": "MongoDB Atlas", "category": "database", "description": "MongoDB on GCP" },
+
+      { "id": "cloud-storage", "name": "Cloud Storage", "category": "storage", "description": "Object storage" },
+      { "id": "cloud-storage-archive", "name": "Cloud Storage Archive", "category": "storage", "description": "Archive storage" },
+      { "id": "filestore", "name": "Filestore", "category": "storage", "description": "Managed NFS" },
+      { "id": "persistent-disk", "name": "Persistent Disk", "category": "storage", "description": "Block storage" },
+
+      { "id": "vpc-gcp", "name": "VPC", "category": "networking", "description": "Virtual network" },
+      { "id": "cloud-load-balancing", "name": "Cloud Load Balancing", "category": "networking", "description": "Global load balancer" },
+      { "id": "cloud-dns", "name": "Cloud DNS", "category": "networking", "description": "DNS service" },
+      { "id": "cloud-cdn", "name": "Cloud CDN", "category": "cdn", "description": "Content delivery" },
+      { "id": "cloud-nat", "name": "Cloud NAT", "category": "networking", "description": "NAT service" },
+      { "id": "cloud-vpn", "name": "Cloud VPN", "category": "networking", "description": "VPN connection" },
+      { "id": "cloud-interconnect", "name": "Cloud Interconnect", "category": "networking", "description": "Dedicated connectivity" },
+      { "id": "cloud-armor", "name": "Cloud Armor", "category": "networking", "description": "DDoS & WAF" },
+      { "id": "private-service-connect", "name": "Private Service Connect", "category": "networking", "description": "Private connectivity" },
+
+      { "id": "iam-gcp", "name": "Cloud IAM", "category": "security", "description": "Identity management" },
+      { "id": "firebase-auth", "name": "Firebase Auth", "category": "security", "description": "User authentication" },
+      { "id": "identity-platform", "name": "Identity Platform", "category": "security", "description": "Customer identity" },
+      { "id": "secret-manager", "name": "Secret Manager", "category": "security", "description": "Secrets management" },
+      { "id": "cloud-kms", "name": "Cloud KMS", "category": "security", "description": "Key management" },
+      { "id": "security-command-center", "name": "Security Command Center", "category": "security", "description": "Security overview" },
+      { "id": "vpc-service-controls", "name": "VPC Service Controls", "category": "security", "description": "Security perimeter" },
+      { "id": "certificate-manager", "name": "Certificate Manager", "category": "security", "description": "SSL/TLS certificates" },
+
+      { "id": "pubsub", "name": "Pub/Sub", "category": "messaging", "description": "Messaging service" },
+      { "id": "pubsub-lite", "name": "Pub/Sub Lite", "category": "messaging", "description": "Zonal messaging" },
+      { "id": "eventarc", "name": "Eventarc", "category": "messaging", "description": "Event routing" },
+
+      { "id": "bigquery", "name": "BigQuery", "category": "analytics", "description": "Data warehouse" },
+      { "id": "bigquery-ml", "name": "BigQuery ML", "category": "analytics", "description": "In-warehouse ML" },
+      { "id": "dataflow", "name": "Dataflow", "category": "analytics", "description": "Stream/batch processing" },
+      { "id": "dataproc", "name": "Dataproc", "category": "analytics", "description": "Managed Spark/Hadoop" },
+      { "id": "data-catalog", "name": "Data Catalog", "category": "analytics", "description": "Metadata catalog" },
+      { "id": "dataplex", "name": "Dataplex", "category": "analytics", "description": "Data lake governance" },
+      { "id": "looker", "name": "Looker", "category": "analytics", "description": "BI platform" },
+      { "id": "looker-studio", "name": "Looker Studio", "category": "analytics", "description": "Dashboards" },
+      { "id": "dataform", "name": "Dataform", "category": "analytics", "description": "SQL workflows" },
+      { "id": "composer", "name": "Cloud Composer", "category": "analytics", "description": "Managed Airflow" },
+
+      { "id": "vertex-ai", "name": "Vertex AI", "category": "ml", "description": "ML platform" },
+      { "id": "vertex-ai-endpoints", "name": "Vertex AI Endpoints", "category": "ml", "description": "Model serving" },
+      { "id": "vertex-ai-feature-store", "name": "Vertex AI Feature Store", "category": "ml", "description": "Feature store" },
+      { "id": "vertex-ai-pipelines", "name": "Vertex AI Pipelines", "category": "ml", "description": "ML pipelines" },
+      { "id": "automl", "name": "AutoML", "category": "ml", "description": "Automated ML" },
+      { "id": "vision-ai", "name": "Vision AI", "category": "ml", "description": "Image analysis" },
+      { "id": "natural-language", "name": "Natural Language API", "category": "ml", "description": "NLP service" },
+      { "id": "speech-to-text", "name": "Speech-to-Text", "category": "ml", "description": "Speech recognition" },
+      { "id": "text-to-speech", "name": "Text-to-Speech", "category": "ml", "description": "Speech synthesis" },
+      { "id": "document-ai", "name": "Document AI", "category": "ml", "description": "Document processing" },
+
+      { "id": "cloud-monitoring", "name": "Cloud Monitoring", "category": "monitoring", "description": "Monitoring service" },
+      { "id": "cloud-logging", "name": "Cloud Logging", "category": "monitoring", "description": "Log management" },
+      { "id": "cloud-trace", "name": "Cloud Trace", "category": "monitoring", "description": "Distributed tracing" },
+      { "id": "cloud-profiler", "name": "Cloud Profiler", "category": "monitoring", "description": "Performance profiling" },
+      { "id": "error-reporting", "name": "Error Reporting", "category": "monitoring", "description": "Error tracking" },
+
+      { "id": "cloud-build", "name": "Cloud Build", "category": "devops", "description": "CI/CD service" },
+      { "id": "cloud-deploy", "name": "Cloud Deploy", "category": "devops", "description": "Continuous delivery" },
+      { "id": "cloud-source-repos", "name": "Cloud Source Repositories", "category": "devops", "description": "Git repository" }
+    ],
+    "azure": [
+      { "id": "virtual-machines", "name": "Virtual Machines", "category": "compute", "description": "VMs" },
+      { "id": "vm-scale-sets", "name": "VM Scale Sets", "category": "compute", "description": "Auto-scaling VMs" },
+      { "id": "azure-batch", "name": "Azure Batch", "category": "compute", "description": "Batch computing" },
+
+      { "id": "aks", "name": "AKS", "category": "containers", "description": "Managed Kubernetes" },
+      { "id": "container-instances", "name": "Container Instances", "category": "containers", "description": "Serverless containers" },
+      { "id": "container-apps", "name": "Container Apps", "category": "containers", "description": "Serverless container platform" },
+      { "id": "container-registry", "name": "Container Registry", "category": "containers", "description": "Container registry" },
+      { "id": "app-service", "name": "App Service", "category": "containers", "description": "Web apps" },
+
+      { "id": "azure-functions", "name": "Azure Functions", "category": "serverless", "description": "Serverless functions" },
+      { "id": "api-management", "name": "API Management", "category": "serverless", "description": "API gateway" },
+      { "id": "logic-apps", "name": "Logic Apps", "category": "serverless", "description": "Workflow automation" },
+      { "id": "durable-functions", "name": "Durable Functions", "category": "serverless", "description": "Stateful functions" },
+
+      { "id": "azure-sql", "name": "Azure SQL Database", "category": "database", "description": "Managed SQL Server" },
+      { "id": "azure-sql-mi", "name": "Azure SQL Managed Instance", "category": "database", "description": "SQL MI" },
+      { "id": "azure-postgres", "name": "Azure Database for PostgreSQL", "category": "database", "description": "Managed PostgreSQL" },
+      { "id": "azure-mysql", "name": "Azure Database for MySQL", "category": "database", "description": "Managed MySQL" },
+      { "id": "cosmos-db", "name": "Cosmos DB", "category": "database", "description": "Multi-model NoSQL" },
+      { "id": "cosmos-db-mongo", "name": "Cosmos DB (MongoDB)", "category": "database", "description": "MongoDB API" },
+      { "id": "azure-cache-redis", "name": "Azure Cache for Redis", "category": "database", "description": "Managed Redis" },
+      { "id": "table-storage", "name": "Table Storage", "category": "database", "description": "NoSQL key-value" },
+
+      { "id": "blob-storage", "name": "Blob Storage", "category": "storage", "description": "Object storage" },
+      { "id": "blob-archive", "name": "Blob Archive Storage", "category": "storage", "description": "Archive storage" },
+      { "id": "azure-files", "name": "Azure Files", "category": "storage", "description": "File shares" },
+      { "id": "adls-gen2", "name": "ADLS Gen2", "category": "storage", "description": "Data lake storage" },
+      { "id": "managed-disks", "name": "Managed Disks", "category": "storage", "description": "Block storage" },
+      { "id": "netapp-files", "name": "Azure NetApp Files", "category": "storage", "description": "Enterprise NFS" },
+
+      { "id": "vnet", "name": "Virtual Network", "category": "networking", "description": "Virtual network" },
+      { "id": "application-gateway", "name": "Application Gateway", "category": "networking", "description": "Layer 7 load balancer" },
+      { "id": "azure-load-balancer", "name": "Azure Load Balancer", "category": "networking", "description": "Layer 4 load balancer" },
+      { "id": "azure-dns", "name": "Azure DNS", "category": "networking", "description": "DNS service" },
+      { "id": "azure-cdn", "name": "Azure CDN", "category": "cdn", "description": "Content delivery" },
+      { "id": "front-door", "name": "Azure Front Door", "category": "cdn", "description": "Global load balancer + CDN" },
+      { "id": "traffic-manager", "name": "Traffic Manager", "category": "networking", "description": "DNS load balancer" },
+      { "id": "nat-gateway-azure", "name": "NAT Gateway", "category": "networking", "description": "Outbound NAT" },
+      { "id": "vpn-gateway", "name": "VPN Gateway", "category": "networking", "description": "VPN connection" },
+      { "id": "expressroute", "name": "ExpressRoute", "category": "networking", "description": "Dedicated connectivity" },
+      { "id": "private-link", "name": "Private Link", "category": "networking", "description": "Private connectivity" },
+      { "id": "azure-firewall", "name": "Azure Firewall", "category": "networking", "description": "Network firewall" },
+      { "id": "azure-waf", "name": "Azure WAF", "category": "networking", "description": "Web application firewall" },
+      { "id": "ddos-protection", "name": "DDoS Protection", "category": "networking", "description": "DDoS mitigation" },
+
+      { "id": "azure-ad", "name": "Azure AD", "category": "security", "description": "Identity service" },
+      { "id": "azure-ad-b2c", "name": "Azure AD B2C", "category": "security", "description": "Customer identity" },
+      { "id": "key-vault", "name": "Key Vault", "category": "security", "description": "Secrets & keys" },
+      { "id": "defender-cloud", "name": "Defender for Cloud", "category": "security", "description": "Security posture" },
+      { "id": "sentinel", "name": "Microsoft Sentinel", "category": "security", "description": "SIEM" },
+
+      { "id": "service-bus", "name": "Service Bus", "category": "messaging", "description": "Message broker" },
+      { "id": "event-hubs", "name": "Event Hubs", "category": "messaging", "description": "Event streaming" },
+      { "id": "event-grid", "name": "Event Grid", "category": "messaging", "description": "Event routing" },
+      { "id": "storage-queues", "name": "Storage Queues", "category": "messaging", "description": "Simple queues" },
+
+      { "id": "synapse", "name": "Synapse Analytics", "category": "analytics", "description": "Analytics platform" },
+      { "id": "synapse-sql", "name": "Synapse SQL Pools", "category": "analytics", "description": "Data warehouse" },
+      { "id": "synapse-spark", "name": "Synapse Spark", "category": "analytics", "description": "Spark pools" },
+      { "id": "data-factory", "name": "Data Factory", "category": "analytics", "description": "ETL/ELT service" },
+      { "id": "databricks", "name": "Azure Databricks", "category": "analytics", "description": "Spark platform" },
+      { "id": "hdinsight", "name": "HDInsight", "category": "analytics", "description": "Managed Hadoop" },
+      { "id": "purview", "name": "Microsoft Purview", "category": "analytics", "description": "Data governance" },
+      { "id": "stream-analytics", "name": "Stream Analytics", "category": "analytics", "description": "Stream processing" },
+      { "id": "power-bi", "name": "Power BI", "category": "analytics", "description": "BI dashboards" },
+      { "id": "cognitive-search", "name": "Cognitive Search", "category": "analytics", "description": "AI search" },
+
+      { "id": "azure-ml", "name": "Azure Machine Learning", "category": "ml", "description": "ML platform" },
+      { "id": "azure-ml-endpoints", "name": "Azure ML Endpoints", "category": "ml", "description": "Model serving" },
+      { "id": "cognitive-services", "name": "Cognitive Services", "category": "ml", "description": "AI APIs" },
+      { "id": "azure-openai", "name": "Azure OpenAI", "category": "ml", "description": "OpenAI models" },
+      { "id": "form-recognizer", "name": "Form Recognizer", "category": "ml", "description": "Document extraction" },
+      { "id": "computer-vision", "name": "Computer Vision", "category": "ml", "description": "Image analysis" },
+      { "id": "speech-services", "name": "Speech Services", "category": "ml", "description": "Speech AI" },
+      { "id": "language-service", "name": "Language Service", "category": "ml", "description": "NLP service" },
+      { "id": "translator", "name": "Translator", "category": "ml", "description": "Translation service" },
+
+      { "id": "azure-monitor", "name": "Azure Monitor", "category": "monitoring", "description": "Monitoring platform" },
+      { "id": "log-analytics", "name": "Log Analytics", "category": "monitoring", "description": "Log management" },
+      { "id": "application-insights", "name": "Application Insights", "category": "monitoring", "description": "APM" },
+      { "id": "azure-alerts", "name": "Azure Alerts", "category": "monitoring", "description": "Alerting" },
+
+      { "id": "azure-devops", "name": "Azure DevOps", "category": "devops", "description": "DevOps platform" },
+      { "id": "azure-repos", "name": "Azure Repos", "category": "devops", "description": "Git repository" },
+      { "id": "azure-pipelines", "name": "Azure Pipelines", "category": "devops", "description": "CI/CD pipelines" },
+      { "id": "azure-artifacts", "name": "Azure Artifacts", "category": "devops", "description": "Package management" }
+    ]
+  }
+}

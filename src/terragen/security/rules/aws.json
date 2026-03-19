@@ -1,0 +1,399 @@
+{
+  "provider": "aws",
+  "rules": [
+    {
+      "id": "AWS001",
+      "severity": "HIGH",
+      "title": "S3 bucket without server-side encryption",
+      "description": "S3 bucket does not have server-side encryption configured",
+      "resource_type": "aws_s3_bucket",
+      "pattern": "resource\\s+\"aws_s3_bucket\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "aws_s3_bucket_server_side_encryption_configuration",
+        "server_side_encryption_configuration"
+      ],
+      "remediation": "Add aws_s3_bucket_server_side_encryption_configuration resource with AES256 or aws:kms"
+    },
+    {
+      "id": "AWS002",
+      "severity": "HIGH",
+      "title": "S3 bucket with public access",
+      "description": "S3 bucket allows public access via ACL",
+      "resource_type": "aws_s3_bucket",
+      "pattern": "acl\\s*=\\s*\"(public-read|public-read-write|authenticated-read)\"",
+      "anti_patterns": [],
+      "remediation": "Remove public ACL and add aws_s3_bucket_public_access_block"
+    },
+    {
+      "id": "AWS003",
+      "severity": "HIGH",
+      "title": "S3 bucket missing public access block",
+      "description": "S3 bucket does not have public access block configured",
+      "resource_type": "aws_s3_bucket",
+      "pattern": "resource\\s+\"aws_s3_bucket\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "aws_s3_bucket_public_access_block"
+      ],
+      "remediation": "Add aws_s3_bucket_public_access_block with all settings set to true"
+    },
+    {
+      "id": "AWS004",
+      "severity": "MEDIUM",
+      "title": "S3 bucket without versioning",
+      "description": "S3 bucket does not have versioning enabled",
+      "resource_type": "aws_s3_bucket",
+      "pattern": "resource\\s+\"aws_s3_bucket\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "aws_s3_bucket_versioning"
+      ],
+      "remediation": "Add aws_s3_bucket_versioning resource with enabled status"
+    },
+    {
+      "id": "AWS005",
+      "severity": "MEDIUM",
+      "title": "S3 bucket without logging",
+      "description": "S3 bucket does not have access logging enabled",
+      "resource_type": "aws_s3_bucket",
+      "pattern": "resource\\s+\"aws_s3_bucket\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "aws_s3_bucket_logging"
+      ],
+      "remediation": "Add aws_s3_bucket_logging resource to enable access logging"
+    },
+    {
+      "id": "AWS006",
+      "severity": "CRITICAL",
+      "title": "Security group allows unrestricted SSH access",
+      "description": "Security group allows SSH (port 22) from 0.0.0.0/0",
+      "resource_type": "aws_security_group",
+      "pattern": "(from_port\\s*=\\s*22|to_port\\s*=\\s*22)[^}]*cidr_blocks\\s*=\\s*\\[\\s*\"0\\.0\\.0\\.0/0\"",
+      "anti_patterns": [],
+      "remediation": "Restrict SSH access to specific IP ranges or use a bastion host"
+    },
+    {
+      "id": "AWS007",
+      "severity": "CRITICAL",
+      "title": "Security group allows unrestricted RDP access",
+      "description": "Security group allows RDP (port 3389) from 0.0.0.0/0",
+      "resource_type": "aws_security_group",
+      "pattern": "(from_port\\s*=\\s*3389|to_port\\s*=\\s*3389)[^}]*cidr_blocks\\s*=\\s*\\[\\s*\"0\\.0\\.0\\.0/0\"",
+      "anti_patterns": [],
+      "remediation": "Restrict RDP access to specific IP ranges or use a bastion host"
+    },
+    {
+      "id": "AWS008",
+      "severity": "HIGH",
+      "title": "Security group allows unrestricted database access",
+      "description": "Security group allows database ports (3306, 5432, 1433, 27017) from 0.0.0.0/0",
+      "resource_type": "aws_security_group",
+      "pattern": "(from_port\\s*=\\s*(3306|5432|1433|27017)|to_port\\s*=\\s*(3306|5432|1433|27017))[^}]*cidr_blocks\\s*=\\s*\\[\\s*\"0\\.0\\.0\\.0/0\"",
+      "anti_patterns": [],
+      "remediation": "Restrict database access to application security groups only"
+    },
+    {
+      "id": "AWS009",
+      "severity": "HIGH",
+      "title": "Security group with unrestricted egress",
+      "description": "Security group allows all outbound traffic to 0.0.0.0/0",
+      "resource_type": "aws_security_group",
+      "pattern": "egress\\s*\\{[^}]*cidr_blocks\\s*=\\s*\\[\\s*\"0\\.0\\.0\\.0/0\"\\s*\\][^}]*protocol\\s*=\\s*\"-1\"",
+      "anti_patterns": [],
+      "remediation": "Restrict egress to only required destinations and ports",
+      "severity_override": "MEDIUM"
+    },
+    {
+      "id": "AWS010",
+      "severity": "HIGH",
+      "title": "RDS instance without encryption",
+      "description": "RDS instance does not have storage encryption enabled",
+      "resource_type": "aws_db_instance",
+      "pattern": "resource\\s+\"aws_db_instance\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "storage_encrypted\\s*=\\s*true"
+      ],
+      "remediation": "Add storage_encrypted = true to enable encryption at rest"
+    },
+    {
+      "id": "AWS011",
+      "severity": "HIGH",
+      "title": "RDS instance publicly accessible",
+      "description": "RDS instance is publicly accessible from the internet",
+      "resource_type": "aws_db_instance",
+      "pattern": "publicly_accessible\\s*=\\s*true",
+      "anti_patterns": [],
+      "remediation": "Set publicly_accessible = false and access via VPC"
+    },
+    {
+      "id": "AWS012",
+      "severity": "MEDIUM",
+      "title": "RDS instance without backup retention",
+      "description": "RDS instance has backup retention set to 0",
+      "resource_type": "aws_db_instance",
+      "pattern": "backup_retention_period\\s*=\\s*0",
+      "anti_patterns": [],
+      "remediation": "Set backup_retention_period to at least 7 days"
+    },
+    {
+      "id": "AWS013",
+      "severity": "MEDIUM",
+      "title": "RDS instance without deletion protection",
+      "description": "RDS instance does not have deletion protection enabled",
+      "resource_type": "aws_db_instance",
+      "pattern": "resource\\s+\"aws_db_instance\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "deletion_protection\\s*=\\s*true"
+      ],
+      "remediation": "Add deletion_protection = true for production databases"
+    },
+    {
+      "id": "AWS014",
+      "severity": "MEDIUM",
+      "title": "RDS instance without Multi-AZ",
+      "description": "RDS instance is not configured for Multi-AZ deployment",
+      "resource_type": "aws_db_instance",
+      "pattern": "resource\\s+\"aws_db_instance\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "multi_az\\s*=\\s*true"
+      ],
+      "remediation": "Add multi_az = true for high availability"
+    },
+    {
+      "id": "AWS015",
+      "severity": "HIGH",
+      "title": "EBS volume without encryption",
+      "description": "EBS volume does not have encryption enabled",
+      "resource_type": "aws_ebs_volume",
+      "pattern": "resource\\s+\"aws_ebs_volume\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "encrypted\\s*=\\s*true"
+      ],
+      "remediation": "Add encrypted = true to enable encryption at rest"
+    },
+    {
+      "id": "AWS016",
+      "severity": "HIGH",
+      "title": "EC2 instance with public IP",
+      "description": "EC2 instance is assigned a public IP address",
+      "resource_type": "aws_instance",
+      "pattern": "associate_public_ip_address\\s*=\\s*true",
+      "anti_patterns": [],
+      "remediation": "Use private subnets with NAT gateway for internet access"
+    },
+    {
+      "id": "AWS017",
+      "severity": "CRITICAL",
+      "title": "IAM policy with wildcard actions",
+      "description": "IAM policy allows all actions (*) on resources",
+      "resource_type": "aws_iam_policy",
+      "pattern": "\"Action\"\\s*:\\s*\"\\*\"|\"Action\"\\s*:\\s*\\[\\s*\"\\*\"\\s*\\]",
+      "anti_patterns": [],
+      "remediation": "Use least-privilege principle with specific actions"
+    },
+    {
+      "id": "AWS018",
+      "severity": "HIGH",
+      "title": "IAM policy with wildcard resources",
+      "description": "IAM policy allows actions on all resources (*)",
+      "resource_type": "aws_iam_policy",
+      "pattern": "\"Resource\"\\s*:\\s*\"\\*\"|\"Resource\"\\s*:\\s*\\[\\s*\"\\*\"\\s*\\]",
+      "anti_patterns": [],
+      "remediation": "Specify exact resource ARNs instead of wildcards"
+    },
+    {
+      "id": "AWS019",
+      "severity": "HIGH",
+      "title": "CloudWatch log group without encryption",
+      "description": "CloudWatch log group is not encrypted with KMS",
+      "resource_type": "aws_cloudwatch_log_group",
+      "pattern": "resource\\s+\"aws_cloudwatch_log_group\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "kms_key_id"
+      ],
+      "remediation": "Add kms_key_id to encrypt logs with KMS"
+    },
+    {
+      "id": "AWS020",
+      "severity": "MEDIUM",
+      "title": "CloudWatch log group without retention",
+      "description": "CloudWatch log group has no retention policy (logs kept forever)",
+      "resource_type": "aws_cloudwatch_log_group",
+      "pattern": "resource\\s+\"aws_cloudwatch_log_group\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "retention_in_days"
+      ],
+      "remediation": "Add retention_in_days to set log retention period"
+    },
+    {
+      "id": "AWS021",
+      "severity": "HIGH",
+      "title": "Lambda function without VPC",
+      "description": "Lambda function is not deployed in a VPC",
+      "resource_type": "aws_lambda_function",
+      "pattern": "resource\\s+\"aws_lambda_function\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "vpc_config"
+      ],
+      "remediation": "Add vpc_config to deploy Lambda in a VPC for network isolation"
+    },
+    {
+      "id": "AWS022",
+      "severity": "HIGH",
+      "title": "ALB not using HTTPS",
+      "description": "Application Load Balancer listener uses HTTP instead of HTTPS",
+      "resource_type": "aws_lb_listener",
+      "pattern": "protocol\\s*=\\s*\"HTTP\"",
+      "anti_patterns": [],
+      "remediation": "Use protocol = HTTPS and configure SSL certificate"
+    },
+    {
+      "id": "AWS023",
+      "severity": "MEDIUM",
+      "title": "ALB without access logs",
+      "description": "Application Load Balancer does not have access logging enabled",
+      "resource_type": "aws_lb",
+      "pattern": "resource\\s+\"aws_lb\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "access_logs"
+      ],
+      "remediation": "Add access_logs block to enable ALB access logging"
+    },
+    {
+      "id": "AWS024",
+      "severity": "HIGH",
+      "title": "EKS cluster endpoint publicly accessible",
+      "description": "EKS cluster API endpoint is publicly accessible",
+      "resource_type": "aws_eks_cluster",
+      "pattern": "endpoint_public_access\\s*=\\s*true",
+      "anti_patterns": [],
+      "remediation": "Set endpoint_public_access = false and use VPN or bastion"
+    },
+    {
+      "id": "AWS025",
+      "severity": "HIGH",
+      "title": "EKS cluster without encryption",
+      "description": "EKS cluster secrets are not encrypted",
+      "resource_type": "aws_eks_cluster",
+      "pattern": "resource\\s+\"aws_eks_cluster\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "encryption_config"
+      ],
+      "remediation": "Add encryption_config block with KMS key for secrets encryption"
+    },
+    {
+      "id": "AWS026",
+      "severity": "MEDIUM",
+      "title": "EKS cluster without logging",
+      "description": "EKS cluster control plane logging is not enabled",
+      "resource_type": "aws_eks_cluster",
+      "pattern": "resource\\s+\"aws_eks_cluster\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "enabled_cluster_log_types"
+      ],
+      "remediation": "Add enabled_cluster_log_types with api, audit, authenticator, controllerManager, scheduler"
+    },
+    {
+      "id": "AWS027",
+      "severity": "MEDIUM",
+      "title": "VPC without flow logs",
+      "description": "VPC does not have flow logs enabled",
+      "resource_type": "aws_vpc",
+      "pattern": "resource\\s+\"aws_vpc\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "aws_flow_log"
+      ],
+      "remediation": "Add aws_flow_log resource to enable VPC flow logging"
+    },
+    {
+      "id": "AWS028",
+      "severity": "HIGH",
+      "title": "SNS topic without encryption",
+      "description": "SNS topic is not encrypted with KMS",
+      "resource_type": "aws_sns_topic",
+      "pattern": "resource\\s+\"aws_sns_topic\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "kms_master_key_id"
+      ],
+      "remediation": "Add kms_master_key_id to encrypt SNS messages"
+    },
+    {
+      "id": "AWS029",
+      "severity": "HIGH",
+      "title": "SQS queue without encryption",
+      "description": "SQS queue is not encrypted with KMS",
+      "resource_type": "aws_sqs_queue",
+      "pattern": "resource\\s+\"aws_sqs_queue\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "kms_master_key_id"
+      ],
+      "remediation": "Add kms_master_key_id to encrypt SQS messages"
+    },
+    {
+      "id": "AWS030",
+      "severity": "CRITICAL",
+      "title": "Hardcoded AWS credentials",
+      "description": "AWS access keys are hardcoded in the configuration",
+      "resource_type": "any",
+      "pattern": "(AKIA[0-9A-Z]{16}|aws_access_key_id\\s*=\\s*\"[A-Z0-9]{20}\")",
+      "anti_patterns": [],
+      "remediation": "Use IAM roles, environment variables, or AWS Secrets Manager"
+    },
+    {
+      "id": "AWS031",
+      "severity": "CRITICAL",
+      "title": "Hardcoded secret key",
+      "description": "AWS secret access key is hardcoded in the configuration",
+      "resource_type": "any",
+      "pattern": "aws_secret_access_key\\s*=\\s*\"[A-Za-z0-9/+=]{40}\"",
+      "anti_patterns": [],
+      "remediation": "Use IAM roles, environment variables, or AWS Secrets Manager"
+    },
+    {
+      "id": "AWS032",
+      "severity": "HIGH",
+      "title": "DynamoDB table without encryption",
+      "description": "DynamoDB table is not using KMS encryption",
+      "resource_type": "aws_dynamodb_table",
+      "pattern": "resource\\s+\"aws_dynamodb_table\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "server_side_encryption"
+      ],
+      "remediation": "Add server_side_encryption block with enabled = true"
+    },
+    {
+      "id": "AWS033",
+      "severity": "MEDIUM",
+      "title": "DynamoDB table without point-in-time recovery",
+      "description": "DynamoDB table does not have point-in-time recovery enabled",
+      "resource_type": "aws_dynamodb_table",
+      "pattern": "resource\\s+\"aws_dynamodb_table\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "point_in_time_recovery"
+      ],
+      "remediation": "Add point_in_time_recovery block with enabled = true"
+    },
+    {
+      "id": "AWS034",
+      "severity": "HIGH",
+      "title": "Elasticsearch domain without encryption",
+      "description": "Elasticsearch domain does not have encryption at rest enabled",
+      "resource_type": "aws_elasticsearch_domain",
+      "pattern": "resource\\s+\"aws_elasticsearch_domain\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "encrypt_at_rest"
+      ],
+      "remediation": "Add encrypt_at_rest block with enabled = true"
+    },
+    {
+      "id": "AWS035",
+      "severity": "HIGH",
+      "title": "Elasticsearch domain without node-to-node encryption",
+      "description": "Elasticsearch domain does not have node-to-node encryption enabled",
+      "resource_type": "aws_elasticsearch_domain",
+      "pattern": "resource\\s+\"aws_elasticsearch_domain\"\\s+\"([^\"]+)\"",
+      "anti_patterns": [
+        "node_to_node_encryption"
+      ],
+      "remediation": "Add node_to_node_encryption block with enabled = true"
+    }
+  ]
+}

@@ -1,0 +1,342 @@
+{
+  "patterns": [
+    {
+      "id": "serverless-api",
+      "name": "Serverless API",
+      "description": "API Gateway + Functions + NoSQL database with authentication",
+      "icon": "zap",
+      "category": "compute",
+      "services": {
+        "aws": ["api-gateway", "lambda", "dynamodb", "cognito", "cloudwatch"],
+        "gcp": ["api-gateway-gcp", "cloud-functions", "firestore", "firebase-auth", "cloud-monitoring"],
+        "azure": ["api-management", "azure-functions", "cosmos-db", "azure-ad-b2c", "azure-monitor"]
+      }
+    },
+    {
+      "id": "serverless-api-sql",
+      "name": "Serverless API (SQL)",
+      "description": "API Gateway + Functions + Relational database",
+      "icon": "zap",
+      "category": "compute",
+      "services": {
+        "aws": ["api-gateway", "lambda", "aurora-serverless", "cognito", "cloudwatch"],
+        "gcp": ["api-gateway-gcp", "cloud-functions", "cloud-sql-postgres", "firebase-auth", "cloud-monitoring"],
+        "azure": ["api-management", "azure-functions", "azure-sql", "azure-ad-b2c", "azure-monitor"]
+      }
+    },
+    {
+      "id": "container-platform",
+      "name": "Container Platform",
+      "description": "Managed Kubernetes with ingress, autoscaling and monitoring",
+      "icon": "boxes",
+      "category": "containers",
+      "services": {
+        "aws": ["eks", "ecr", "alb", "ec2-auto-scaling", "cloudwatch"],
+        "gcp": ["gke", "artifact-registry", "cloud-load-balancing", "cloud-monitoring"],
+        "azure": ["aks", "container-registry", "application-gateway", "azure-monitor"]
+      }
+    },
+    {
+      "id": "container-platform-serverless",
+      "name": "Serverless Containers",
+      "description": "Serverless container platform with auto-scaling",
+      "icon": "boxes",
+      "category": "containers",
+      "services": {
+        "aws": ["fargate", "ecs", "ecr", "alb", "cloudwatch"],
+        "gcp": ["cloud-run", "artifact-registry", "cloud-load-balancing", "cloud-monitoring"],
+        "azure": ["container-apps", "container-registry", "azure-monitor"]
+      }
+    },
+    {
+      "id": "three-tier-web",
+      "name": "Three-Tier Web App",
+      "description": "Load balancer + Auto-scaling compute + Database + Cache",
+      "icon": "layers",
+      "category": "compute",
+      "services": {
+        "aws": ["alb", "ec2-auto-scaling", "rds-postgres", "elasticache-redis", "cloudwatch"],
+        "gcp": ["cloud-load-balancing", "instance-groups", "cloud-sql-postgres", "memorystore-redis", "cloud-monitoring"],
+        "azure": ["application-gateway", "vm-scale-sets", "azure-postgres", "azure-cache-redis", "azure-monitor"]
+      }
+    },
+    {
+      "id": "data-lake",
+      "name": "Data Lakehouse",
+      "description": "Object storage + Data catalog + ETL + Query engine + Governance",
+      "icon": "database",
+      "category": "data",
+      "services": {
+        "aws": ["s3", "glue-catalog", "glue", "athena", "lake-formation"],
+        "gcp": ["cloud-storage", "data-catalog", "dataflow", "bigquery", "dataplex"],
+        "azure": ["adls-gen2", "purview", "data-factory", "synapse-sql", "synapse"]
+      }
+    },
+    {
+      "id": "data-warehouse",
+      "name": "Data Warehouse",
+      "description": "Cloud data warehouse with ETL pipelines and BI",
+      "icon": "database",
+      "category": "data",
+      "services": {
+        "aws": ["redshift", "glue", "s3", "quicksight", "cloudwatch"],
+        "gcp": ["bigquery", "dataflow", "cloud-storage", "looker", "cloud-monitoring"],
+        "azure": ["synapse-sql", "data-factory", "adls-gen2", "power-bi", "azure-monitor"]
+      }
+    },
+    {
+      "id": "streaming-analytics",
+      "name": "Real-time Analytics",
+      "description": "Event streaming + Stream processing + Data warehouse + Dashboards",
+      "icon": "bar-chart",
+      "category": "data",
+      "services": {
+        "aws": ["kinesis", "kinesis-analytics", "redshift", "quicksight", "cloudwatch"],
+        "gcp": ["pubsub", "dataflow", "bigquery", "looker-studio", "cloud-monitoring"],
+        "azure": ["event-hubs", "stream-analytics", "synapse-sql", "power-bi", "azure-monitor"]
+      }
+    },
+    {
+      "id": "data-pipeline",
+      "name": "ETL/ELT Pipeline",
+      "description": "Batch data processing with orchestration",
+      "icon": "workflow",
+      "category": "data",
+      "services": {
+        "aws": ["glue", "step-functions", "s3", "athena", "cloudwatch"],
+        "gcp": ["dataflow", "composer", "cloud-storage", "bigquery", "cloud-monitoring"],
+        "azure": ["data-factory", "logic-apps", "adls-gen2", "synapse-sql", "azure-monitor"]
+      }
+    },
+    {
+      "id": "ml-platform",
+      "name": "ML Platform",
+      "description": "Feature store + Training pipelines + Model serving + Monitoring",
+      "icon": "brain",
+      "category": "ml",
+      "services": {
+        "aws": ["sagemaker", "sagemaker-feature-store", "sagemaker-endpoint", "s3", "cloudwatch"],
+        "gcp": ["vertex-ai", "vertex-ai-feature-store", "vertex-ai-endpoints", "cloud-storage", "cloud-monitoring"],
+        "azure": ["azure-ml", "azure-ml-endpoints", "adls-gen2", "azure-monitor"]
+      }
+    },
+    {
+      "id": "ml-inference",
+      "name": "ML Inference API",
+      "description": "Model serving with API endpoint and auto-scaling",
+      "icon": "brain",
+      "category": "ml",
+      "services": {
+        "aws": ["sagemaker-endpoint", "api-gateway", "lambda", "cloudwatch"],
+        "gcp": ["vertex-ai-endpoints", "cloud-endpoints", "cloud-monitoring"],
+        "azure": ["azure-ml-endpoints", "api-management", "azure-monitor"]
+      }
+    },
+    {
+      "id": "genai-app",
+      "name": "GenAI Application",
+      "description": "LLM-powered application with vector DB",
+      "icon": "brain",
+      "category": "ml",
+      "services": {
+        "aws": ["bedrock", "opensearch", "lambda", "api-gateway", "cloudwatch"],
+        "gcp": ["vertex-ai", "bigquery", "cloud-functions", "api-gateway-gcp", "cloud-monitoring"],
+        "azure": ["azure-openai", "cognitive-search", "azure-functions", "api-management", "azure-monitor"]
+      }
+    },
+    {
+      "id": "event-driven",
+      "name": "Event-Driven Architecture",
+      "description": "Event bus + Message queues + Fan-out + Event handlers",
+      "icon": "radio",
+      "category": "integration",
+      "services": {
+        "aws": ["eventbridge", "sqs", "sns", "lambda", "cloudwatch"],
+        "gcp": ["eventarc", "pubsub", "cloud-functions", "cloud-monitoring"],
+        "azure": ["event-grid", "service-bus", "azure-functions", "azure-monitor"]
+      }
+    },
+    {
+      "id": "message-queue",
+      "name": "Message Queue System",
+      "description": "Reliable message queuing with dead-letter handling",
+      "icon": "radio",
+      "category": "integration",
+      "services": {
+        "aws": ["sqs", "sns", "lambda", "cloudwatch"],
+        "gcp": ["pubsub", "cloud-functions", "cloud-monitoring"],
+        "azure": ["service-bus", "azure-functions", "azure-monitor"]
+      }
+    },
+    {
+      "id": "kafka-streaming",
+      "name": "Kafka Streaming",
+      "description": "Managed Kafka for event streaming",
+      "icon": "radio",
+      "category": "integration",
+      "services": {
+        "aws": ["msk", "lambda", "s3", "cloudwatch"],
+        "gcp": ["pubsub", "dataflow", "cloud-storage", "cloud-monitoring"],
+        "azure": ["event-hubs", "stream-analytics", "adls-gen2", "azure-monitor"]
+      }
+    },
+    {
+      "id": "cicd-containers",
+      "name": "CI/CD for Containers",
+      "description": "Container build + Push to registry + Deploy to Kubernetes",
+      "icon": "git-branch",
+      "category": "devops",
+      "services": {
+        "aws": ["codepipeline", "codebuild", "ecr", "eks", "cloudwatch"],
+        "gcp": ["cloud-build", "artifact-registry", "cloud-deploy", "gke", "cloud-monitoring"],
+        "azure": ["azure-pipelines", "container-registry", "aks", "azure-monitor"]
+      }
+    },
+    {
+      "id": "cicd-serverless",
+      "name": "CI/CD for Serverless",
+      "description": "Serverless deployment pipeline",
+      "icon": "git-branch",
+      "category": "devops",
+      "services": {
+        "aws": ["codepipeline", "codebuild", "lambda", "api-gateway", "cloudwatch"],
+        "gcp": ["cloud-build", "cloud-functions", "api-gateway-gcp", "cloud-monitoring"],
+        "azure": ["azure-pipelines", "azure-functions", "api-management", "azure-monitor"]
+      }
+    },
+    {
+      "id": "secure-vpc",
+      "name": "Secure VPC/VNet",
+      "description": "Private subnets + NAT + VPC endpoints + Security groups",
+      "icon": "shield",
+      "category": "security",
+      "services": {
+        "aws": ["vpc", "nat-gateway", "privatelink", "waf", "guardduty"],
+        "gcp": ["vpc-gcp", "cloud-nat", "private-service-connect", "cloud-armor", "security-command-center"],
+        "azure": ["vnet", "nat-gateway-azure", "private-link", "azure-waf", "defender-cloud"]
+      }
+    },
+    {
+      "id": "secure-vpc-vpn",
+      "name": "Hybrid Network",
+      "description": "VPC with VPN/Direct Connect to on-premises",
+      "icon": "shield",
+      "category": "security",
+      "services": {
+        "aws": ["vpc", "vpn", "direct-connect", "transit-gateway", "cloudwatch"],
+        "gcp": ["vpc-gcp", "cloud-vpn", "cloud-interconnect", "cloud-monitoring"],
+        "azure": ["vnet", "vpn-gateway", "expressroute", "azure-monitor"]
+      }
+    },
+    {
+      "id": "multi-region",
+      "name": "Multi-Region Setup",
+      "description": "Global load balancing + Multi-region database + Cross-region replication",
+      "icon": "globe",
+      "category": "security",
+      "services": {
+        "aws": ["route53", "cloudfront", "aurora", "s3", "global-accelerator"],
+        "gcp": ["cloud-dns", "cloud-cdn", "spanner", "cloud-storage", "cloud-load-balancing"],
+        "azure": ["traffic-manager", "front-door", "cosmos-db", "blob-storage", "azure-monitor"]
+      }
+    },
+    {
+      "id": "static-website",
+      "name": "Static Website",
+      "description": "CDN + Object storage + SSL certificate",
+      "icon": "globe",
+      "category": "compute",
+      "services": {
+        "aws": ["cloudfront", "s3", "route53", "acm"],
+        "gcp": ["cloud-cdn", "cloud-storage", "cloud-dns", "certificate-manager"],
+        "azure": ["azure-cdn", "blob-storage", "azure-dns", "key-vault"]
+      }
+    },
+    {
+      "id": "microservices",
+      "name": "Microservices Platform",
+      "description": "Service mesh + API Gateway + Service discovery + Observability",
+      "icon": "boxes",
+      "category": "containers",
+      "services": {
+        "aws": ["eks", "api-gateway", "ecr", "xray", "cloudwatch"],
+        "gcp": ["gke", "api-gateway-gcp", "artifact-registry", "cloud-trace", "cloud-monitoring"],
+        "azure": ["aks", "api-management", "container-registry", "application-insights", "azure-monitor"]
+      }
+    },
+    {
+      "id": "search-platform",
+      "name": "Search Platform",
+      "description": "Full-text search with analytics",
+      "icon": "search",
+      "category": "analytics",
+      "services": {
+        "aws": ["opensearch", "kinesis-firehose", "s3", "cloudwatch"],
+        "gcp": ["bigquery", "pubsub", "cloud-storage", "cloud-monitoring"],
+        "azure": ["cognitive-search", "event-hubs", "blob-storage", "azure-monitor"]
+      }
+    },
+    {
+      "id": "observability-stack",
+      "name": "Observability Stack",
+      "description": "Metrics + Logs + Traces + Alerting",
+      "icon": "activity",
+      "category": "monitoring",
+      "services": {
+        "aws": ["cloudwatch", "cloudwatch-alarms", "xray", "cloudtrail"],
+        "gcp": ["cloud-monitoring", "cloud-logging", "cloud-trace", "error-reporting"],
+        "azure": ["azure-monitor", "log-analytics", "application-insights", "azure-alerts"]
+      }
+    }
+  ],
+  "productionOptions": [
+    {
+      "id": "high-availability",
+      "name": "High Availability",
+      "description": "Multi-AZ/Zone deployment",
+      "default": true
+    },
+    {
+      "id": "encryption",
+      "name": "Encryption",
+      "description": "At rest and in transit",
+      "default": true
+    },
+    {
+      "id": "auto-scaling",
+      "name": "Auto-scaling",
+      "description": "Scale based on demand",
+      "default": true
+    },
+    {
+      "id": "monitoring",
+      "name": "Monitoring & Alerting",
+      "description": "Metrics, logs, and alerts",
+      "default": true
+    },
+    {
+      "id": "backup",
+      "name": "Automated Backups",
+      "description": "Regular backups with retention",
+      "default": true
+    },
+    {
+      "id": "disaster-recovery",
+      "name": "Disaster Recovery",
+      "description": "Cross-region failover",
+      "default": false
+    },
+    {
+      "id": "cost-optimization",
+      "name": "Cost Optimization",
+      "description": "Spot/preemptible instances",
+      "default": false
+    },
+    {
+      "id": "compliance",
+      "name": "Compliance Ready",
+      "description": "Audit logging and controls",
+      "default": false
+    }
+  ]
+}
