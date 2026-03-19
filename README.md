@@ -2,9 +2,7 @@
 
 AI-powered Terraform code generator with multi-LLM support, architecture diagram analysis, and intelligent model routing.
 
-<p align="center">
-  <img src="docs/images/architecture.svg" alt="TerraGen Architecture" width="800"/>
-</p>
+![TerraGen Architecture](docs/images/architecture.svg)
 
 ## Features
 
@@ -438,9 +436,7 @@ All file types are displayed in the code editor with syntax highlighting:
 
 Upload your architecture diagram and TerraGen will generate Terraform code from it.
 
-<p align="center">
-  <img src="docs/images/diagram-flow.svg" alt="Diagram to Terraform Flow" width="800"/>
-</p>
+![Diagram to Terraform Flow](docs/images/diagram-flow.svg)
 
 ### How It Works
 
@@ -472,9 +468,7 @@ curl -X POST http://localhost:8000/generate/analyze-image \
 
 TerraGen uses a multi-agent pipeline for reliable infrastructure generation.
 
-<p align="center">
-  <img src="docs/images/pipeline.svg" alt="Pipeline Stages" width="800"/>
-</p>
+![Pipeline Stages](docs/images/pipeline.svg)
 
 ### Pipeline Stages
 
