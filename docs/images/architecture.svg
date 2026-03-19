@@ -83,7 +83,7 @@
   <!-- Tools Box -->
   <g transform="translate(50, 320)">
     <rect width="700" height="60" rx="8" fill="#1a202c" stroke="#4a5568" stroke-width="1"/>
-    <text x="350" y="20" text-anchor="middle" fill="#a0aec0" font-family="system-ui" font-size="12" font-weight="600">Tools & Integrations</text>
+    <text x="350" y="20" text-anchor="middle" fill="#a0aec0" font-family="system-ui" font-size="12" font-weight="600">Tools &amp; Integrations</text>
     <g transform="translate(40, 30)">
       <text x="0" y="15" fill="#68d391" font-family="system-ui" font-size="10">terraform</text>
     </g>
